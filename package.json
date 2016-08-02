@@ -1,0 +1,16 @@
+{
+  "name": "coreio",
+  "version": "0.0.0",
+  "description": "Core.io is a model list framework and builds the backend part of XQCore",
+  "main": "coreio.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "keywords": [
+    "model",
+    "xqcore",
+    "syncedmodel"
+  ],
+  "author": "Andi Heinkelein <andifeind@noname-media.com>",
+  "license": "MIT"
+}
