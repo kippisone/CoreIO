@@ -4,7 +4,7 @@
   "description": "Core.io is a model list framework and builds the backend part of XQCore",
   "main": "coreio.js",
   "scripts": {
-    "test": "npm test"
+    "test": "mocha --reporter lagoon-reporter tests/*.spec.js"
   },
   "keywords": [
     "model",
@@ -12,5 +12,13 @@
     "syncedmodel"
   ],
   "author": "Andi Heinkelein <andifeind@noname-media.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "inspect.js": "^1.2.1",
+    "lagoon-reporter": "^0.3.3",
+    "sinon": "^1.17.5"
+  },
+  "dependencies": {
+    "logtopus": "^0.3.0"
+  }
 }
