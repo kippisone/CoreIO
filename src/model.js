@@ -32,7 +32,7 @@ module.exports = function(CoreIO) {
    *
    * @param {Object} conf Model extend object
    */
-  var Model = function(name, conf) {
+  var Model = function CoreIOModel(name, conf) {
     //Call Event constructor
     CoreIO.Event.call(this);
 
