@@ -721,7 +721,7 @@ describe('CoreIO Model', function() {
     it('Should not call sync method when validation fails', function() {
       var syncStub = sinon.stub();
       var validationStub = sinon.stub(model, 'validate');
-      validationStub.returns({});
+      validationStub.returns([{ property: 'a' }]);
 
       model.sync = syncStub;
       model.schema = { a: 'Number' };
@@ -1028,8 +1028,9 @@ describe('CoreIO Model', function() {
     });
 
     it('Should push data to a existing dataset and should fail with an error', function() {
-      var emitStub = sinon.stub(model, 'emit'),
-        errorStub = sinon.stub(model, 'error');
+      let log = require('logtopus').getLogger('coreio');
+      let emitStub = sinon.stub(model, 'emit'),
+        errorStub = sinon.stub(log, 'error');
 
       model.properties = { listing: {} };
       model.push('listing', {name: 'DDD', value: '4'});
@@ -1175,8 +1176,9 @@ describe('CoreIO Model', function() {
     });
 
     it('Should unshift data to a existing dataset and should fail with an error', function() {
-      var emitStub = sinon.stub(model, 'emit'),
-        errorStub = sinon.stub(model, 'error');
+      let log = require('logtopus').getLogger('coreio');
+      let emitStub = sinon.stub(model, 'emit'),
+        errorStub = sinon.stub(log, 'error');
 
       model.properties = { listing: {} };
       model.unshift('listing', {name: 'DDD', value: '4'});
@@ -1347,9 +1349,9 @@ describe('CoreIO Model', function() {
     });
 
     it('Should insert data to a existing dataset and should fail with an error', function() {
-      var emitStub = sinon.stub(model, 'emit'),
-        errorStub = sinon.stub(model, 'error');
-
+      let log = require('logtopus').getLogger('coreio');
+      let emitStub = sinon.stub(model, 'emit'),
+        errorStub = sinon.stub(log, 'error');
 
       model.properties = { listing: {} };
       model.insert('listing', 1, {name: 'DDD', value: '4'});
@@ -1504,8 +1506,9 @@ describe('CoreIO Model', function() {
     });
 
     it('Should remove data to a existing dataset and should fail with an error', function() {
-      var emitStub = sinon.stub(model, 'emit'),
-        errorStub = sinon.stub(model, 'error');
+      let log = require('logtopus').getLogger('coreio');
+      let emitStub = sinon.stub(model, 'emit'),
+        errorStub = sinon.stub(log, 'error');
 
 
       model.properties = { listing: {} };
@@ -1540,14 +1543,14 @@ describe('CoreIO Model', function() {
     });
   });
 
-  describe('update', function() {
+  describe('modify', function() {
     var model;
 
     beforeEach(function() {
       model = new CoreIO.Model('test');
     });
 
-    it('Should update data to a subset', function() {
+    it('Should modify data to a subset', function() {
       var emitStub = sinon.stub(model, 'emit');
       model.properties = { listing: [
         { name: 'AAA', value: '1' },
@@ -1563,9 +1566,9 @@ describe('CoreIO Model', function() {
         ]
       };
 
-      model.update('listing', 0, { name: 'DDD', value: '4' });
+      model.modify('listing', 0, { name: 'DDD', value: '4' });
       inspect(emitStub).wasCalledTwice();
-      inspect(emitStub).wasCalledWith('data.update', 'listing', 0, { name: 'DDD', value: '4' }, { name: 'AAA', value: '1' });
+      inspect(emitStub).wasCalledWith('data.modify', 'listing', 0, { name: 'DDD', value: '4' }, { name: 'AAA', value: '1' });
       inspect(emitStub).wasCalledWith('data.change', finalData);
 
       inspect(model.properties).isEql(finalData);
@@ -1573,7 +1576,7 @@ describe('CoreIO Model', function() {
       emitStub.restore();
     });
 
-    it('Should update data to a subset using match object', function() {
+    it('Should modify data to a subset using match object', function() {
       var emitStub = sinon.stub(model, 'emit');
       model.properties = { listing: [
         { name: 'AAA', value: '1' },
@@ -1589,9 +1592,9 @@ describe('CoreIO Model', function() {
         ]
       };
 
-      model.update('listing', { name: 'BBB' }, { name: 'DDD', value: '4' });
+      model.modify('listing', { name: 'BBB' }, { name: 'DDD', value: '4' });
       inspect(emitStub).wasCalledTwice();
-      inspect(emitStub).wasCalledWith('data.update', 'listing', { name: 'BBB' }, { name: 'DDD', value: '4' }, { name: 'BBB', value: '2' });
+      inspect(emitStub).wasCalledWith('data.modify', 'listing', { name: 'BBB' }, { name: 'DDD', value: '4' }, { name: 'BBB', value: '2' });
       inspect(emitStub).wasCalledWith('data.change', finalData);
 
       inspect(model.properties).isEql(finalData);
@@ -1599,7 +1602,7 @@ describe('CoreIO Model', function() {
       emitStub.restore();
     });
 
-    it('Should update data to a subset (path ist listing.data)', function() {
+    it('Should modify data to a subset (path ist listing.data)', function() {
       var emitStub = sinon.stub(model, 'emit');
       model.properties = {
         listing: {
@@ -1621,9 +1624,9 @@ describe('CoreIO Model', function() {
         }
       };
 
-      model.update('listing.data', 1, { name: 'DDD', value: '4' });
+      model.modify('listing.data', 1, { name: 'DDD', value: '4' });
       inspect(emitStub).wasCalledTwice();
-      inspect(emitStub).wasCalledWith('data.update', 'listing.data', 1, { name: 'DDD', value: '4' }, { name: 'BBB', value: '2' });
+      inspect(emitStub).wasCalledWith('data.modify', 'listing.data', 1, { name: 'DDD', value: '4' }, { name: 'BBB', value: '2' });
       inspect(emitStub).wasCalledWith('data.change', finalData);
 
       inspect(model.properties).isEql(finalData);
@@ -1631,7 +1634,7 @@ describe('CoreIO Model', function() {
       emitStub.restore();
     });
 
-    it('Should update data to a subset and should never emit an event', function() {
+    it('Should modify data to a subset and should never emit an event', function() {
       var emitStub = sinon.stub(model, 'emit');
       model.properties = {
         listing: [
@@ -1649,7 +1652,7 @@ describe('CoreIO Model', function() {
         ]
       };
 
-      model.update('listing', 1, { name: 'DDD', value: '4' }, {
+      model.modify('listing', 1, { name: 'DDD', value: '4' }, {
         silent: true
       });
 
@@ -1659,13 +1662,13 @@ describe('CoreIO Model', function() {
       emitStub.restore();
     });
 
-    it('Should update data from a not existing dataset', function() {
+    it('Should modify data from a not existing dataset', function() {
       var emitStub = sinon.stub(model, 'emit');
       model.properties = {
         listing: []
       };
 
-      model.update('listing', 1);
+      model.modify('listing', 1);
 
       inspect(emitStub).wasNotCalled();
       inspect(model.properties).isEql({
@@ -1674,7 +1677,7 @@ describe('CoreIO Model', function() {
       emitStub.restore();
     });
 
-    it('Should call sync method with update mode', function() {
+    it('Should call sync method with modify mode', function() {
       var syncStub = sinon.stub();
       model.sync = syncStub;
 
@@ -1686,10 +1689,10 @@ describe('CoreIO Model', function() {
         ]
       };
 
-      model.update('listing', 1, { name: 'DDD', value: '4' }, { noSync: false });
+      model.modify('listing', 1, { name: 'DDD', value: '4' }, { noSync: false });
 
       inspect(syncStub).wasCalledOnce();
-      inspect(syncStub).wasCalledWith('update', 'listing', 1, { name: 'DDD', value: '4' });
+      inspect(syncStub).wasCalledWith('modify', 'listing', 1, { name: 'DDD', value: '4' });
     });
 
     it('Should not call sync method when sync option is false', function() {
@@ -1697,7 +1700,7 @@ describe('CoreIO Model', function() {
       model.sync = syncStub;
 
       model.properties = { listing: [] };
-      model.update('listing', 1, { noSync: true });
+      model.modify('listing', 1, { noSync: true });
 
       inspect(syncStub).wasNotCalled();
     });
@@ -1885,7 +1888,7 @@ describe('CoreIO Model', function() {
   });
 
   describe('has', function() {
-    it('Should check whether a property exists in model', function() {
+    it('Should check whether a property exists in model (strings)', function() {
       var testModel = new CoreIO.Model();
 
       testModel.set({
@@ -1898,7 +1901,7 @@ describe('CoreIO Model', function() {
       inspect(testModel.has('z')).isFalse();
     });
 
-    it('Should check whether a property exists in model', function() {
+    it('Should check whether a property exists in model (falsy values)', function() {
       var testModel = new CoreIO.Model();
 
       testModel.set({
@@ -2218,7 +2221,6 @@ describe('CoreIO Model', function() {
         title: 'Test'
       });
 
-      inspect.print(result);
       inspect(result).isNull();
       inspect(model.isValid()).isTrue();
     });
