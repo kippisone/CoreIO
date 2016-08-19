@@ -2479,4 +2479,52 @@ describe('CoreIO Model', function() {
       inspect(model.isValid()).isFalse();
     });
   });
+
+  describe('fetch', function() {
+    it('method does exists', function() {
+      var model = new CoreIO.Model();
+      inspect(model).hasMethod('fetch');
+    });
+
+    it('returns a promise', function() {
+      var model = new CoreIO.Model();
+      inspect(model.fetch()).isPromise();
+    });
+
+    it('calls service.fetch with all args', function() {
+      let fetchStub = sinon.stub();
+      fetchStub.returns(Promise.resolve());
+
+      let model = new CoreIO.Model('test', {
+        service: {
+          fetch: fetchStub
+        }
+      });
+
+      let res = model.fetch('foo', 'bar');
+
+      inspect(fetchStub).wasCalledOnce();
+      inspect(fetchStub).wasCalledWith('foo', 'bar');
+    });
+
+    it('fetch sets model data', function() {
+      let testData = {
+        id: 1,
+        name: 'Test I'
+      };
+
+      let fetchStub = sinon.stub();
+      fetchStub.returns(Promise.resolve(testData));
+
+      let model = new CoreIO.Model('test', {
+        service: {
+          fetch: fetchStub
+        }
+      });
+
+      return model.fetch().then(() => {
+        inspect(model.properties).isEql(testData);
+      });
+    });
+  });
 });

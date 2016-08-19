@@ -51,7 +51,8 @@ module.exports = function(CoreIO) {
     /**
      * Stores models properties
      * @type {Object}
-     * @property properties
+     * @property pro
+     * perties
      */
     this.properties = {};
 
@@ -1224,6 +1225,17 @@ module.exports = function(CoreIO) {
       }
     }
   };
+
+  Model.prototype.fetch = function() {
+    if (this.service) {
+      let args = Array.prototype.slice.call(arguments);
+      return this.service.fetch.apply(this.service, args).then(data => {
+        this.set(data);
+      });
+    }
+
+    return Promise.resolve(null);
+  }
 
   /**
    * Returns model as JSON
