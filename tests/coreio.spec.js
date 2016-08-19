@@ -12,10 +12,52 @@ describe('CoreIO', function() {
       inspect(CoreIO).hasMethod('createModel');
     });
 
-    it.only('creates a model class', function() {
-      let model = CoreIO.createModel('test', {});
-      inspect(model).isClass();
-      inspect(model).isInheritedBy(CoreIO.Model);
+    it('creates a model class', function() {
+      let Model = CoreIO.createModel('test', {});
+      inspect(Model).isClass();
+      inspect(Model).isInheritedBy(CoreIO.Model);
+    });
+
+    it('creates a model class with config', function() {
+      let Model = CoreIO.createModel('test', {
+        schema: {
+          name: { type: 'string', min: 3, max: 10 }
+        }
+      });
+
+      let model = new Model();
+      inspect(model).isObject();
+      inspect(model).isInstanceOf(CoreIO.Model);
+      inspect(model.schema).isEql({
+        name: { type: 'string', min: 3, max: 10 }
+      });
+    });
+  });
+
+  describe.only('createService', function() {
+    it('does exists', function() {
+      inspect(CoreIO).hasMethod('createService');
+    });
+
+    it('creates a service class', function() {
+      let Service = CoreIO.createService('test', {});
+      inspect(Service).isClass();
+      inspect(Service).isInheritedBy(CoreIO.Service);
+    });
+
+    it('creates a service class with config', function() {
+      let Service = CoreIO.createService('test', {
+        schema: {
+          name: { type: 'string', min: 3, max: 10 }
+        }
+      });
+
+      let service = new Service();
+      inspect(service).isObject();
+      inspect(service).isInstanceOf(CoreIO.Service);
+      inspect(service.foo).isEql({
+        name: { type: 'string', min: 3, max: 10 }
+      });
     });
   });
 });
