@@ -34,3 +34,67 @@ let title = myModel.get('title');
 ```
  There are a huche set of methods o deal with the model data.
  See [our api docs](docs) for a full list.
+
+Routes
+------
+
+Core.io uses express-server under the hood. All files from you routes folder will be loaded and called automaticly.
+
+`/routes/*.js` files are interpreted as a express middleware and should contain only route configurations.
+
+```js
+// routes/inde.js
+module.exports = function(CoreIO) {
+  app.get('/', (req, res) => {
+    res.log('Hello world');
+  });
+};
+
+```
+
+```js
+// models/fruits.js
+let CoreIO = require('coreio');
+let FruitsModel = CoreIO.createModel('fruits', {
+  service: CoreIO.MongoDBService,
+  schema: {
+    name: { type: 'string', min: 3, max: 25, required: true }
+  }
+});
+
+```
+
+
+```js
+let FruitsModel = require('../models/fruitsModel');
+// let fruitsModel = new FruitsModel();
+
+module.exports = function(app) {
+  app.get('/fruits/:name', (req, res) => {
+    FruitsModel.fetch(req.params.name).then(model => {
+      let data = model.get();
+      if (!data) {
+        res.status(404);
+        res.json({ msg: 'Not found' });
+      }
+    }).then(err => {
+      res.status(500);
+      res.send(err.message);
+    });
+  });
+};
+
+```
+
+The short way
+
+```js
+let FruitsModel = require('../models/fruitsModel');
+
+CoreIO.api('/fruits/:name', {
+  get: ctx => {
+    return FruitsModel.fetch(ctx.params.name);
+  }
+});
+
+```
