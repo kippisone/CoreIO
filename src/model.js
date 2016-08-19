@@ -32,7 +32,7 @@ module.exports = function(CoreIO) {
    *
    * @param {Object} conf Model extend object
    */
-  var Model = function(name, conf) {
+  var Model = function CoreIOModel(name, conf) {
     //Call Event constructor
     CoreIO.Event.call(this);
 
@@ -429,6 +429,11 @@ module.exports = function(CoreIO) {
     for (var i = 0, len = key.length; i < len; i++) {
       if (typeof obj === 'object' && obj.hasOwnProperty(key[i])) {
         obj = obj[key[i]];
+        if (obj === undefined) {
+          hasKey = false;
+          break;
+        }
+
         continue;
       }
 
@@ -502,7 +507,7 @@ module.exports = function(CoreIO) {
       this.properties = [data];
     }
     else {
-      this.error('Model.push requires an array. Dataset isn\'t an array. Path: ', path);
+      log.error('Model.push requires an array. Dataset isn\'t an array. Path: ', path);
       return;
     }
 
@@ -538,7 +543,7 @@ module.exports = function(CoreIO) {
       this.properties = [data];
     }
     else {
-      this.error('Model.unshift requires an array. Dataset isn\'t an array. Path: ', path);
+      log.error('Model.unshift requires an array. Dataset isn\'t an array. Path: ', path);
       return;
     }
 
@@ -581,7 +586,7 @@ module.exports = function(CoreIO) {
       CoreIO.dedotify(this.properties, path, [data]);
     }
     else {
-      this.error('Model.insert requires an array. Dataset isn\'t an array. Path: ', path);
+      log.error('Model.insert requires an array. Dataset isn\'t an array. Path: ', path);
       return;
     }
 
@@ -616,7 +621,7 @@ module.exports = function(CoreIO) {
       removed = dataset.splice(index, 1);
     }
     else if (typeof dataset === 'object') {
-      this.error('Model.remove requires an array. Dataset isn\'t an array. Path: ', path);
+      log.error('Model.remove requires an array. Dataset isn\'t an array. Path: ', path);
       return;
     }
 
