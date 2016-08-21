@@ -19,6 +19,7 @@
     "sinon": "^1.17.5"
   },
   "dependencies": {
-    "logtopus": "^0.3.0"
+    "logtopus": "^0.3.0",
+    "sockjs": "^0.3.17"
   }
 }

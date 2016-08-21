@@ -1,12 +1,16 @@
 'use strict';
 
 let CoreIO = {
-  logLevel: 'sys'
+  logLevel: 'sys',
+  socketPort: 9889
 };
 
 require('./utils')(CoreIO);
 CoreIO.Event = require('./event')(CoreIO);
 CoreIO.Model = require('./model')(CoreIO);
+CoreIO.Service = require('./service')(CoreIO);
+CoreIO.Socket = require('./socket')(CoreIO);
+CoreIO.SyncModel = require('./syncmodel')(CoreIO);
 
 /**
  * Creates a model class

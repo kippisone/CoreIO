@@ -34,7 +34,7 @@ describe('CoreIO', function() {
     });
   });
 
-  describe.only('createService', function() {
+  describe('createService', function() {
     it('does exists', function() {
       inspect(CoreIO).hasMethod('createService');
     });
@@ -47,17 +47,13 @@ describe('CoreIO', function() {
 
     it('creates a service class with config', function() {
       let Service = CoreIO.createService('test', {
-        schema: {
-          name: { type: 'string', min: 3, max: 10 }
-        }
+        foo: 'bar'
       });
 
       let service = new Service();
       inspect(service).isObject();
       inspect(service).isInstanceOf(CoreIO.Service);
-      inspect(service.foo).isEql({
-        name: { type: 'string', min: 3, max: 10 }
-      });
+      inspect(service.foo).isEql('bar');
     });
   });
 });
