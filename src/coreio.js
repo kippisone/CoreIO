@@ -7,9 +7,11 @@ let CoreIO = {
 
 require('./utils')(CoreIO);
 CoreIO.Event = require('./event')(CoreIO);
+CoreIO.List = require('./list')(CoreIO);
 CoreIO.Model = require('./model')(CoreIO);
 CoreIO.Service = require('./service')(CoreIO);
 CoreIO.Socket = require('./socket')(CoreIO);
+CoreIO.SyncList = require('./synclist')(CoreIO);
 CoreIO.SyncModel = require('./syncmodel')(CoreIO);
 
 /**
