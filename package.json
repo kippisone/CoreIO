@@ -2,7 +2,7 @@
   "name": "coreio",
   "version": "0.0.0",
   "description": "Core.io is a model list framework and builds the backend part of XQCore",
-  "main": "coreio.js",
+  "main": "src/coreio.js",
   "scripts": {
     "test": "mocha --reporter lagoon-reporter tests/*.spec.js"
   },
