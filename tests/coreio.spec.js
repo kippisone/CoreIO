@@ -34,6 +34,88 @@ describe('CoreIO', function() {
     });
   });
 
+  describe('createList', function() {
+    it('does exists', function() {
+      inspect(CoreIO).hasMethod('createList');
+    });
+
+    it('creates a model class', function() {
+      let List = CoreIO.createList('test', {});
+      inspect(List).isClass();
+      inspect(List).isInheritedBy(CoreIO.List);
+    });
+
+    it('creates a model class with config', function() {
+      let List = CoreIO.createList('test', {
+        schema: {
+          name: { type: 'string', min: 3, max: 10 }
+        }
+      });
+
+      let model = new List();
+      inspect(model).isObject();
+      inspect(model).isInstanceOf(CoreIO.List);
+      inspect(model.schema).isEql({
+        name: { type: 'string', min: 3, max: 10 }
+      });
+    });
+  });
+
+
+  describe('createSyncModel', function() {
+    it('does exists', function() {
+      inspect(CoreIO).hasMethod('createSyncModel');
+    });
+
+    it('creates a syncmodel class', function() {
+      let SyncModel = CoreIO.createSyncModel('test', {});
+      inspect(SyncModel).isClass();
+      inspect(SyncModel).isInheritedBy(CoreIO.Model);
+    });
+
+    it('creates a syncmodel class with config', function() {
+      let SyncModel = CoreIO.createSyncModel('test', {
+        schema: {
+          name: { type: 'string', min: 3, max: 10 }
+        }
+      });
+
+      let syncModel = new SyncModel();
+      inspect(syncModel).isObject();
+      inspect(syncModel).isInstanceOf(CoreIO.SyncModel);
+      inspect(syncModel.schema).isEql({
+        name: { type: 'string', min: 3, max: 10 }
+      });
+    });
+  });
+
+  describe('createSyncList', function() {
+    it('does exists', function() {
+      inspect(CoreIO).hasMethod('createSyncList');
+    });
+
+    it('creates a model class', function() {
+      let SyncList = CoreIO.createSyncList('test', {});
+      inspect(SyncList).isClass();
+      inspect(SyncList).isInheritedBy(CoreIO.List);
+    });
+
+    it('creates a model class with config', function() {
+      let SyncList = CoreIO.createSyncList('test', {
+        schema: {
+          name: { type: 'string', min: 3, max: 10 }
+        }
+      });
+
+      let model = new SyncList();
+      inspect(model).isObject();
+      inspect(model).isInstanceOf(CoreIO.SyncList);
+      inspect(model.schema).isEql({
+        name: { type: 'string', min: 3, max: 10 }
+      });
+    });
+  });
+
   describe('createService', function() {
     it('does exists', function() {
       inspect(CoreIO).hasMethod('createService');
