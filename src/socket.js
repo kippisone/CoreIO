@@ -78,7 +78,7 @@ module.exports = function(CoreIO) {
       socketServer.installHandlers(server, { prefix: '/' + this.path.replace(/^\//, '') });
 
       socketServer.on('connection', function(conn) {
-        log.dev('New connection', conn.id, conn.pathname);
+        log.sys('New connection', conn.id, conn.pathname);
         Socket.__socketServerInstances[this.host + ':' + this.port].connections.push(conn);
 
         conn.on('data', function(msg) {
@@ -92,7 +92,7 @@ module.exports = function(CoreIO) {
         }.bind(this));
 
         conn.on('close', function(err) {
-          log.dev('Close socket connection', err);
+          log.sys('Close socket connection', err);
 
           for (var i = 0, len = Socket.__socketServerInstances[this.host + ':' + this.port].connections.length; i < len; i++) {
             if (Socket.__socketServerInstances[this.host + ':' + this.port].connections[i] === conn) {
