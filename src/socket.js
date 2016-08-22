@@ -88,7 +88,7 @@ module.exports = function(CoreIO) {
           var args = msg.args || [];
           args.unshift(msg.eventName);
           args.push(conn);
-          socketServer.channels[msg.channel].emit.apply(socketServer.channels, args);
+          socketServer.channels[msg.channel].emit.apply(socketServer.channels[msg.channel], args);
         }.bind(this));
 
         conn.on('close', function(err) {
