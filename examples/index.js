@@ -6,12 +6,16 @@ let log2 = require('logtopus').getLogger('coreio');
 log2.setLevel('debug');
 let express = require('express');
 let app = express();
+let bodyParser = require('body-parser');
+
+app.use(bodyParser.json());
+app.use((req, res, next) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Headers', 'content-type');
+  next();
+});
 
 log.sys('Start sync model');
-
-// function getBrowser(ua) {
-//   return ua;
-// }
 
 let syncModel = new CoreIO.SyncModel('example', {
   defaults: {
@@ -20,17 +24,21 @@ let syncModel = new CoreIO.SyncModel('example', {
   }
 });
 
-// let syncList = new CoreIO.SyncList('example-list', {
-//
-// });
+let syncList = new CoreIO.SyncList('example', {
+
+});
 
 app.get('/count', (req, res) => {
   let count = syncModel.get('counter');
   syncModel.set('counter', count += 1);
-  // syncList.push({
-  //   browser: getBrowser(req.get('user-agent')),
-  //   time: (new Date()).toString()
-  // });
+  res.send(204);
+});
+
+app.post('/list/add', (req, res) => {
+  syncList.push({
+    value: req.body.value
+  });
+
   res.send('OK');
 });
 
