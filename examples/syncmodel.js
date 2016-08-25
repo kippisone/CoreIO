@@ -9,6 +9,10 @@ let app = express();
 
 log.sys('Start sync model');
 
+// function getBrowser(ua) {
+//   return ua;
+// }
+
 let syncModel = new CoreIO.SyncModel('example', {
   defaults: {
     counter: 0,
@@ -16,17 +20,30 @@ let syncModel = new CoreIO.SyncModel('example', {
   }
 });
 
+// let syncList = new CoreIO.SyncList('example-list', {
+//
+// });
+
 app.get('/count', (req, res) => {
   let count = syncModel.get('counter');
   syncModel.set('counter', count += 1);
+  // syncList.push({
+  //   browser: getBrowser(req.get('user-agent')),
+  //   time: (new Date()).toString()
+  // });
   res.send('OK');
 });
 
-syncModel.socket.__socket.on('connection', () => {
-  console.log('GOT sock', this);
-  syncModel.set('connections', syncModel.socket.__socket.connections.length)
+let monitoring = syncModel.socket.monitor();
+monitoring.on('client.connect', () => {
+  let stats = monitoring.stats();
+  syncModel.set('connections', stats.connections);
 });
 
+monitoring.on('client.disconnect', () => {
+  let stats = monitoring.stats();
+  syncModel.set('connections', stats.connections);
+});
 
 app.listen(6446);
 

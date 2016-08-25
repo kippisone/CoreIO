@@ -70,9 +70,9 @@ module.exports = function(CoreIO) {
 
     /**
      * Sets max length of event listeners
-     * @property {Number} maxLength
+     * @property {Number} listenerMaxLength
      */
-    this.maxLength = CoreIO.eventListenerMaxLength;
+    this.listenerMaxLength = CoreIO.eventListenerMaxLength;
   };
 
   /**
@@ -89,7 +89,7 @@ module.exports = function(CoreIO) {
     }
 
     this.__events[event].push(listener);
-    if (this.__events[event].length > this.maxLength) {
+    if (this.__events[event].length > this.listenerMaxLength) {
       log.warn('Listener max length was exceeded!', 'List:', event, 'Length:', this.__events[event].length);
     }
     else {

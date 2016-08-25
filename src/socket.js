@@ -33,8 +33,6 @@ module.exports = function(CoreIO) {
   let log = require('logtopus').getLogger('coreio');
   let sockjs = require('sockjs');
 
-  let sockjsServer;
-
   let Socket = function(conf) {
     conf = conf || {};
     this.port = conf.port || CoreIO.socketPort;
@@ -60,6 +58,7 @@ module.exports = function(CoreIO) {
    * @private
    */
   Socket.__channels = {};
+
 
   Socket.prototype.getSocketServer = function() {
     if (!Socket.__socketServerInstances[this.host + ':' + this.port]) {
@@ -100,7 +99,15 @@ module.exports = function(CoreIO) {
               break;
             }
           }
+
+          if (this.__monitoring) {
+            this.__monitoring.emit('client.disconnect');
+          }
         }.bind(this));
+
+        if (this.__monitoring) {
+          this.__monitoring.emit('client.connect');
+        }
       }.bind(this));
 
       Socket.__socketServerInstances[this.host + ':' + this.port] = socketServer;
@@ -267,6 +274,21 @@ module.exports = function(CoreIO) {
       }
     }
   };
+
+  Socket.prototype.monitor = function() {
+    if (!this.__monitoring) {
+      this.__monitoring = new CoreIO.Event();
+
+      this.__monitoring.stats = () => {
+        return {
+          connections: this.__socket.connections.length,
+          channels: Object.keys(this.__socket.channels)
+        }
+      }
+    }
+
+    return this.__monitoring;
+  }
 
   return Socket;
 };

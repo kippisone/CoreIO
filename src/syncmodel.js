@@ -81,7 +81,6 @@ module.exports = function(CoreIO) {
   SyncModel.prototype.registerListener = function() {
     this.socket.on('syncmodel.register', function(data, connection) {
       log.debug('Register new user at model', data, connection.pathname, this.channel);
-      // this.socket.setGroup(connection, 'syncmodel.' + this.name.toLowerCase());
       this.socket.emitOne(connection, 'syncmodel.init', this.get());
     }.bind(this));
 
@@ -92,7 +91,6 @@ module.exports = function(CoreIO) {
 
     this.socket.on('syncmodel.unregister', function(data, connection) {
       log.debug('Unregister user from model', data, connection.pathname);
-      // this.socket.unsetGroup(connection, 'syncmodel');
     }.bind(this));
 
     if (this.isWriteable) {
