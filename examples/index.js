@@ -28,10 +28,13 @@ let syncList = new CoreIO.SyncList('example', {
 
 });
 
-app.get('/count', (req, res) => {
-  let count = syncModel.get('counter');
-  syncModel.set('counter', count += 1);
-  res.send(204);
+// app.get('/count', (req, res) => {
+//   let count = syncModel.get('counter');
+//   syncModel.set('counter', count += 1);
+//   res.send(204);
+// });
+CoreIO.api(syncModel, {
+  allow: 'READ, CREATE'
 });
 
 app.post('/list/add', (req, res) => {

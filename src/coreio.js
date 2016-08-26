@@ -9,6 +9,7 @@ require('./utils')(CoreIO);
 CoreIO.Event = require('./event')(CoreIO);
 CoreIO.List = require('./list')(CoreIO);
 CoreIO.Model = require('./model')(CoreIO);
+CoreIO.Router = require('./router')(CoreIO);
 CoreIO.Service = require('./service')(CoreIO);
 CoreIO.Socket = require('./socket')(CoreIO);
 CoreIO.SyncList = require('./synclist')(CoreIO);
@@ -83,5 +84,19 @@ CoreIO.createSyncList = function(name, opts) {
 CoreIO.createService = function(name, opts) {
   return CoreIO.Service.inherit(name, opts);
 };
+
+CoreIO.createRouter = function(slug) {
+  let router = require('express').Router();
+  return router;
+};
+
+CoreIO.api = function(model, conf) {
+  let router = new CoreIO.Router(conf);
+  if (model instanceof CoreIO.Model) {
+    router.coupleModel(model);
+  }
+
+  return router;
+}
 
 module.exports = CoreIO;
