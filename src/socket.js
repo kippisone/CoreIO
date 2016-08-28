@@ -36,7 +36,7 @@ module.exports = function(CoreIO) {
   let Socket = function(conf) {
     conf = conf || {};
     this.port = conf.port || CoreIO.socketPort;
-    this.host = conf.host || '0.0.0.0';
+    this.host = conf.host || CoreIO.socketHost;
     this.path = conf.path || 'xqsocket';
     this.channel = conf.channel;
 
@@ -70,9 +70,7 @@ module.exports = function(CoreIO) {
 
       socketServer.connections = [];
       socketServer.channels = {};
-      var server;
-      server = http.createServer();
-      server.listen(this.port, this.host);
+      var server = CoreIO.getHttpServer(CoreIO.socketHost, CoreIO.socketPort);
 
       socketServer.installHandlers(server, { prefix: '/' + this.path.replace(/^\//, '') });
 

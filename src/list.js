@@ -228,18 +228,19 @@ module.exports = function(CoreIO) {
         this.items.splice(0, this.items.length - this.maxLength);
       }
 
+      let data = models.map(model => model.toJSON());
       if (!options.silent) {
-        this.emit('item.push', models, length);
+        this.emit('item.push', data, length);
       }
 
       if (!options.noSync) {
         if (typeof this.sync === 'function') {
-          this.sync('push', models);
+          this.sync('push', data);
         }
       }
     }
 
-    return true;
+    return Promise.resolve();
   };
 
   /**

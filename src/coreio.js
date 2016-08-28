@@ -2,7 +2,10 @@
 
 let CoreIO = {
   logLevel: 'sys',
-  socketPort: 9889
+  socketPort: 9889,
+  socketHost: '0.0.0.0',
+  httpPort: 6446,
+  httpHost: '0.0.0.0'
 };
 
 require('./utils')(CoreIO);
@@ -92,11 +95,33 @@ CoreIO.createRouter = function(slug) {
 
 CoreIO.api = function(model, conf) {
   let router = new CoreIO.Router(conf);
+  if (typeof model === 'string') {
+    return router.route(model);
+  }
+
   if (model instanceof CoreIO.Model) {
     router.coupleModel(model);
   }
+  else if (model instanceof CoreIO.List) {
+    router.coupleList(model);
+  }
 
   return router;
+}
+
+CoreIO.getHttpServer = function(host, port) {
+  if (!CoreIO.__httpServers) {
+    CoreIO.__httpServers = {};
+  }
+
+  if (CoreIO.__httpServers[host + ':' + port]) {
+    return CoreIO.__httpServers[host + ':' + port];
+  }
+
+  let http = require('http');
+  let server = http.createServer();
+  server.listen(port, host);
+  return server;
 }
 
 module.exports = CoreIO;
