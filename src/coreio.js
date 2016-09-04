@@ -8,11 +8,14 @@ let CoreIO = {
   httpHost: '0.0.0.0'
 };
 
+CoreIO.conf = {};
+
 require('./utils')(CoreIO);
 CoreIO.Event = require('./event')(CoreIO);
 CoreIO.List = require('./list')(CoreIO);
 CoreIO.Model = require('./model')(CoreIO);
 CoreIO.Router = require('./router')(CoreIO);
+CoreIO.ReadyState = require('./readystate')(CoreIO);
 CoreIO.Service = require('./service')(CoreIO);
 CoreIO.Socket = require('./socket')(CoreIO);
 CoreIO.SyncList = require('./synclist')(CoreIO);
@@ -122,6 +125,14 @@ CoreIO.getHttpServer = function(host, port) {
   let server = http.createServer();
   server.listen(port, host);
   return server;
+}
+
+CoreIO.getConf = function(name, defaultValue) {
+  return CoreIO.conf[name] || defaultValue;
+}
+
+CoreIO.setConf = function(name, value) {
+  CoreIO.conf[name] = value;
 }
 
 module.exports = CoreIO;

@@ -71,6 +71,9 @@ module.exports = function(CoreIO) {
       name = undefined;
     }
 
+    // call ready state constructor
+    CoreIO.ReadyState.call(this);
+
     var Proto = function(_name, _options) {
       //TODO call this later, ready state will be set before _options had been run
       CoreIO.Service.call(this, name, options);
@@ -96,6 +99,8 @@ module.exports = function(CoreIO) {
     Proto.prototype.constructor = Proto;
     return Proto;
   };
+
+  Service.prototype = Object.create(CoreIO.ReadyState.prototype);
 
   /**
    * Save model data
