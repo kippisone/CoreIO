@@ -78,15 +78,20 @@ module.exports = function(CoreIO) {
         log.sys('New connection', conn.id, conn.pathname);
         Socket.__socketServerInstances[this.host + ':' + this.port].connections.push(conn);
 
-        conn.on('data', function(msg) {
+        conn.on('data', (msg) => {
           msg = JSON.parse(msg);
           log.req('Got socket message ' + conn.pathname + ' @ ' + msg.channel + ' : ' + msg.eventName, msg.args);
 
           var args = msg.args || [];
           args.unshift(msg.eventName);
           args.push(conn);
+          if (!socketServer.channels.hasOwnProperty(msg.channel)) {
+            log.warn('Channel ' + msg.channel + ' is not registered!');
+            return;
+          }
+
           socketServer.channels[msg.channel].emit.apply(socketServer.channels[msg.channel], args);
-        }.bind(this));
+        });
 
         conn.on('close', function(err) {
           log.sys('Close socket connection', err);
@@ -98,13 +103,13 @@ module.exports = function(CoreIO) {
             }
           }
 
-          if (this.__monitoring) {
-            this.__monitoring.emit('client.disconnect');
+          if (socketServer.monitoring) {
+            socketServer.monitoring.emit('client.disconnect');
           }
         }.bind(this));
 
-        if (this.__monitoring) {
-          this.__monitoring.emit('client.connect');
+        if (socketServer.monitoring) {
+          socketServer.monitoring.emit('client.connect');
         }
       }.bind(this));
 
@@ -274,10 +279,10 @@ module.exports = function(CoreIO) {
   };
 
   Socket.prototype.monitor = function() {
-    if (!this.__monitoring) {
-      this.__monitoring = new CoreIO.Event();
+    if (!this.__socket.monitoring) {
+      this.__socket.monitoring = new CoreIO.Event();
 
-      this.__monitoring.stats = () => {
+      this.__socket.monitoring.stats = () => {
         return {
           connections: this.__socket.connections.length,
           channels: Object.keys(this.__socket.channels)
@@ -285,7 +290,7 @@ module.exports = function(CoreIO) {
       }
     }
 
-    return this.__monitoring;
+    return this.__socket.monitoring;
   }
 
   return Socket;

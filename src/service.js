@@ -110,7 +110,24 @@ module.exports = function(CoreIO) {
    * @overwritable
    * @return {object} Returns a promise
    */
-  Service.prototype.save = function () {
+  Service.prototype.save = function (data) {
+    if (data.id) {
+      return this.update(data.id, data);
+    }
+    else {
+      return this.insert(data);
+    }
+  };
+
+  /**
+   * Save model data
+   *
+   * @method insert
+   *
+   * @overwritable
+   * @return {object} Returns a promise
+   */
+  Service.prototype.insert = function () {
     return Promise.resolve();
   };
 

@@ -1,15 +1,30 @@
 'use strict';
 
 let CoreIO = require('../src/coreio');
+let MongoDBService = require('coreio-mongodb')(CoreIO);
 let log = require('logtopus').getLogger('coreio-example');
 let log2 = require('logtopus').getLogger('coreio');
 log2.setLevel('debug');
 
 log.sys('Start sync model');
 
-let syncModel = new CoreIO.SyncModel('example', {
+CoreIO.setConf('mongodb', 'mongodb://localhost:27017/coreio-example');
+
+let syncModel = new CoreIO.SyncModel('hitcounter', {
   defaults: {
-    counter: 0,
+    counter: 0
+  },
+
+  service: MongoDBService,
+  autoSave: true,
+
+  schema: {
+    counter: { type: 'number' }
+  }
+});
+
+let connectionModel = new CoreIO.SyncModel('connectionCounter', {
+  defaults: {
     connections: 0
   }
 });
@@ -33,16 +48,15 @@ CoreIO.api(syncList, {
   allow: 'READ, CREATE'
 });
 
-let monitoring = syncModel.socket.monitor();
-monitoring.on('client.connect', () => {
+let monitoring = connectionModel.socket.monitor();
+let updateConnectionsCounter = function() {
   let stats = monitoring.stats();
-  syncModel.set('connections', stats.connections);
-});
+  connectionModel.set('connections', stats.connections);
+};
 
-monitoring.on('client.disconnect', () => {
-  let stats = monitoring.stats();
-  syncModel.set('connections', stats.connections);
-});
+monitoring.on('client.connect', updateConnectionsCounter);
+monitoring.on('client.disconnect', updateConnectionsCounter);
+updateConnectionsCounter();
 
 log.sys(' ... listen on port:', syncModel.port);
 log.sys(' ... registered path:', syncModel.path);

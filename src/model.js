@@ -85,10 +85,16 @@ module.exports = function(CoreIO) {
     this.conf = conf;
 
     /**
+     * Model short name
+     * @property {String} name
+     */
+    this.shortName = (name ? name.replace(/Model$/, '') : 'Nameless');
+
+    /**
      * Model name
      * @property {String} name
      */
-    this.name = (name ? name.replace(/Model$/, '') : 'Nameless') + 'Model';
+    this.name = this.shortName + 'Model';
 
     //-- Add default values
     if (this.defaults && !CoreIO.isEmptyObject(this.defaults)) {
@@ -105,6 +111,26 @@ module.exports = function(CoreIO) {
           this.properties[key] = this.schema[key].default !== undefined ? this.schema[key].default : null;
         }
       }, this);
+    }
+
+    // initialize service
+    if (this.service) {
+      let serviceConf = {
+        name: this.collection || this.table || this.shortName
+      };
+
+      let Service = this.service;
+      this.__service = new Service(serviceConf);
+      log.info('Connect model with service', Service.name);
+      this.__service.then(() => {
+        log.sys('... service succesfully connected!');
+        if (this.autoSave) {
+          this.fetch();
+        }
+      }).catch(err => {
+        log.error('... service connection failed!', err);
+      });
+
     }
 
     this.__isValid = !this.schema;
@@ -194,12 +220,14 @@ module.exports = function(CoreIO) {
    * data.change<br>
    * &lt;key&gt;.change
    *
-   * options: {
-   *   silent: <Boolean> Don't trigger any events
-   *   noValidation: <Boolean> Don't validate
-   *   replace: <Boolean> Replace all date with new data
-   *   noSync: <Boolean> Do not call sync method. Default: false
-   * }
+   * **options**
+   * | property | type | description |
+   * ---------------------------------
+   * | silent | {boolean} | Don't trigger any events
+   * | noValidation | {boolean} | Don't validate
+   * | replace | {boolean} | Replace all date with new data
+   * | noSync | {boolean} | Do not call sync method. Default: false
+   * | noAutoSave | {boolean} | Dissable autosave
    *
    * @method set
    * @param {String} key
@@ -297,6 +325,11 @@ module.exports = function(CoreIO) {
       this.emit('data.change', newData, oldData);
     }
 
+    if (this.autoSave && this.__service && !options.noAutoSave) {
+      log.info('Autosave model', this.name);
+      return this.save();
+    }
+
     return Promise.resolve(newData);
   };
 
@@ -325,16 +358,7 @@ module.exports = function(CoreIO) {
 
     if (key === undefined || key === null) {
       if (options.copy === true) {
-        data = this.properties;
-        switch (typeof data) {
-          case 'object':
-            return Array.isArray(data) ? data.slice() : Object.assign(true, {}, data);
-          case 'function':
-            //jshint evil:true
-            return eval('(' + data.toString() + ')');
-          default:
-            return data;
-        }
+        return Object.assign({}, this.properties);
       }
 
       return this.properties;
@@ -1227,15 +1251,40 @@ module.exports = function(CoreIO) {
   };
 
   Model.prototype.fetch = function() {
-    if (this.service) {
+    if (this.__service) {
+      log.info('Fetch data from service');
       let args = Array.prototype.slice.call(arguments);
-      return this.service.fetch.apply(this.service, args).then(data => {
-        this.set(data);
+      return this.__service.fetch.apply(this.__service, args).then(data => {
+        console.log('Fetch DATA', data)
+        this.set(data, {
+          noAutoSave: true
+        });
       });
     }
 
     return Promise.resolve(null);
   }
+
+  /**
+   * Save model data
+   *
+   * @method save
+   *
+   * @overwritable
+   * @return {object} Returns a promise
+   */
+  Model.prototype.save = function() {
+    let data = this.get({
+      copy: true
+    });
+
+    if (data.id) {
+      return this.__service.update(data.id, data);
+    }
+    else {
+      return this.__service.insert(data);
+    }
+  };
 
   /**
    * Returns model as JSON
