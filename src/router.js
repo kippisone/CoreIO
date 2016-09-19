@@ -8,7 +8,7 @@ module.exports = function(CoreIO) {
   let log = require('logtopus').getLogger('coreio');
   log.setLevel(CoreIO.logLevel);
 
-  log.sys('Liten on port', CoreIO.httpPort);
+  log.sys('Listen on port', CoreIO.httpPort);
   app.listen(CoreIO.httpPort, CoreIO.httpHost);
 
   app.use(bodyParser.json());
@@ -17,7 +17,6 @@ module.exports = function(CoreIO) {
     res.set('Access-Control-Allow-Headers', 'content-type');
     next();
   });
-
 
   class Router {
     constructor(conf) {

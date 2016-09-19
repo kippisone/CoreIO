@@ -1255,7 +1255,6 @@ module.exports = function(CoreIO) {
       log.info('Fetch data from service');
       let args = Array.prototype.slice.call(arguments);
       return this.__service.fetch.apply(this.__service, args).then(data => {
-        console.log('Fetch DATA', data)
         this.set(data, {
           noAutoSave: true
         });
@@ -1293,6 +1292,17 @@ module.exports = function(CoreIO) {
    */
   Model.prototype.toJSON = function() {
     return this.get();
+  };
+
+  /**
+   * Returns model data as a stringified JSON
+   * @method stringify
+   *
+   * @param {boolean} pretty Enable pretty print
+   * @return {Object} Returns model data as JSON
+   */
+  Model.prototype.stringify = function(pretty) {
+    return JSON.stringify(this.get(), null, pretty === true ? '  ' : pretty);
   };
 
   //--
