@@ -113,6 +113,14 @@ CoreIO.api = function(model, conf) {
 }
 
 CoreIO.getHttpServer = function(host, port) {
+  if (!host) {
+    host = CoreIO.httpHost;
+  }
+
+  if (!port) {
+    port = CoreIO.httpPort;
+  }
+
   if (!CoreIO.__httpServers) {
     CoreIO.__httpServers = {};
   }

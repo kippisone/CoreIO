@@ -3,6 +3,7 @@
 let express = require('express');
 let app = express();
 let bodyParser = require('body-parser');
+let logtopus = require('logtopus');
 
 module.exports = function(CoreIO) {
   let log = require('logtopus').getLogger('coreio');
@@ -17,6 +18,10 @@ module.exports = function(CoreIO) {
     res.set('Access-Control-Allow-Headers', 'content-type');
     next();
   });
+
+  app.use(logtopus.express({
+    logLevel: CoreIO.logLevel
+  }));
 
   class Router {
     constructor(conf) {

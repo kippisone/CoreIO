@@ -34,6 +34,7 @@ module.exports = function(CoreIO) {
     this.isWriteable = !!this.isWriteable;
 
     this.initSocket();
+    this.initRest();
     this.registerListener();
   };
 
@@ -70,6 +71,19 @@ module.exports = function(CoreIO) {
     });
 
     return this.socket.start();
+  };
+
+  SyncModel.prototype.initRest = function() {
+    CoreIO.api('/coreio/models/' + this.shortName).get((req, res) => {
+      if (req.accepts('json') === 'json') {
+        res.json(this.get());
+      } else if (req.accepts('html') === 'html') {
+        res.send(JSON.stringify(this.get(), null, '  '));
+      } else {
+        res.send(406);
+        log.warn('Accept header missing or invalid in request', req.path);
+      }
+    });
   };
 
   /**
