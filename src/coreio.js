@@ -1,6 +1,9 @@
 'use strict';
 
-let CoreIO = {
+import Utils from './utils';
+import Socket from './socket';
+
+const CoreIO = {
   logLevel: 'sys',
   socketPort: 9889,
   socketHost: '0.0.0.0',
@@ -10,17 +13,17 @@ let CoreIO = {
 
 CoreIO.conf = {};
 
-require('./utils')(CoreIO);
+Utils(CoreIO);
 CoreIO.Event = require('./event')(CoreIO);
 CoreIO.List = require('./list')(CoreIO);
 CoreIO.Model = require('./model')(CoreIO);
 CoreIO.Router = require('./router')(CoreIO);
 CoreIO.ReadyState = require('./readystate')(CoreIO);
 CoreIO.Service = require('./service')(CoreIO);
-CoreIO.Socket = require('./socket')(CoreIO);
 CoreIO.SyncList = require('./synclist')(CoreIO);
 CoreIO.SyncModel = require('./syncmodel')(CoreIO);
 
+CoreIO.Socket = Socket(CoreIO);
 /**
  * Creates a model class
  *

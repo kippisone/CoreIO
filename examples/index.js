@@ -1,6 +1,6 @@
 'use strict';
 
-let CoreIO = require('../src/coreio');
+let CoreIO = require('../lib/coreio');
 let MongoDBService = require('coreio-mongodb')(CoreIO);
 let log = require('logtopus').getLogger('coreio-example');
 let log2 = require('logtopus').getLogger('coreio');

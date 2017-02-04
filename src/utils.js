@@ -5,7 +5,7 @@
  */
 'use strict';
 
-module.exports = function(CoreIO) {
+export function Utils(CoreIO) {
   CoreIO.undotify = function(path, obj) {
     if(path) {
       path = path.split('.');
