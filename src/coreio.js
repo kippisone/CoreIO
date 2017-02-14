@@ -99,7 +99,8 @@ CoreIO.createRouter = function(slug) {
   return router;
 };
 
-CoreIO.api = function(model, conf) {
+CoreIO.api = function(slug, conf) {
+  conf.slug = slug;
   let router = new CoreIO.Router(conf);
   if (typeof model === 'string') {
     return router.route(model);

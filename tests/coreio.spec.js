@@ -4,7 +4,7 @@ let inspect = require('inspect.js');
 let sinon = require('sinon');
 inspect.useSinon(sinon);
 
-let CoreIO = require('../src/coreio');
+let CoreIO = require('../lib/coreio');
 
 describe('CoreIO', function() {
   describe('createModel', function() {
@@ -136,6 +136,18 @@ describe('CoreIO', function() {
       inspect(service).isObject();
       inspect(service).isInstanceOf(CoreIO.Service);
       inspect(service.foo).isEql('bar');
+    });
+  });
+
+  describe.only('api', function() {
+    it('registers an API route', function() {
+      let TestModel = CoreIO.createModel('test', {
+        defaults: { foo: 'bar' }
+      });
+
+      CoreIO.api('/test', {
+        model: TestModel
+      });
     });
   });
 });

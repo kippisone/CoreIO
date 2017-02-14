@@ -92,9 +92,76 @@ The short way
 let FruitsModel = require('../models/fruitsModel');
 
 CoreIO.api('/fruits/:name', {
-  get: ctx => {
-    return FruitsModel.fetch(ctx.params.name);
+  get(ctx) {
+    const model = new FruitsModel();
+    return model.fetch({
+      name: ctx.params.name
+    });
   }
 });
 
+```
+
+The super short way
+
+```js
+let FruitsModel = require('../models/fruitsModel');
+
+CoreIO.api('/fruits/', {
+  model: FruitsModel,
+  allow: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'LIST']
+});
+
+
+```
+ is an equivalent of
+
+```js
+let FruitsModel = require('../models/fruitsModel');
+
+CoreIO.api('/fruits/:id', {
+  get(ctx) {
+    const model = new FruitsModel();
+    return model.fetch({
+      name: ctx.params.name
+    });
+  },
+  put(ctx) {
+    const model = new FruitsModel();
+    model.fetch({
+      name: ctx.params.name
+    });
+    model.replace(ctx.body);
+    return model.update();
+  },
+  patch(ctx) {
+    const model = new FruitsModel();
+    model.fetch({
+      name: ctx.params.name
+    });
+    model.set(ctx.body);
+    return model.update();
+  },
+  delete(ctx) {
+    const model = new FruitsModel();
+    return model.destroy({
+      name: ctx.params.name
+    });
+  }
+});
+
+CoreIO.api('/fruits/', {
+  get(ctx) {
+    const model = new FruitsModel();
+    const list = new XQCore.List(model.name, {
+      model: FruitsModel
+    });
+    return list.fetch();
+  },
+  post(ctx) {
+    const model = new FruitsModel();
+    model.set(ctx.body);
+    return model.save();
+  }
+});
 ```

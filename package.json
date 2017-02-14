@@ -5,7 +5,8 @@
   "main": "lib/coreio.js",
   "scripts": {
     "test": "mocha --reporter lagoon-reporter tests/*.spec.js",
-    "build": "babel src -d lib"
+    "build": "babel src -d lib",
+    "dev": "babel src -d lib --watch"
   },
   "keywords": [
     "model",

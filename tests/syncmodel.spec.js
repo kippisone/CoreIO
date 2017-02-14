@@ -4,7 +4,7 @@ let inspect = require('inspect.js');
 let sinon = require('sinon');
 inspect.useSinon(sinon);
 
-let CoreIO = require('../src/coreio');
+let CoreIO = require('../lib/coreio');
 let log = require('logtopus').getLogger('coreio');
 log.setLevel('error');
 
