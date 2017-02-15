@@ -5,6 +5,9 @@
     "mocha": true,
     "es6": true
   },
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "rules": {
     "no-console": 1,
     "no-unused-vars": [2, {"vars": "all", "args": "none"}],

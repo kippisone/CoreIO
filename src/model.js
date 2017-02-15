@@ -1261,7 +1261,7 @@ module.exports = function(CoreIO) {
       });
     }
 
-    return Promise.resolve(null);
+    return Promise.resolve(this.get());
   }
 
   /**
@@ -1272,17 +1272,43 @@ module.exports = function(CoreIO) {
    * @overwritable
    * @return {object} Returns a promise
    */
-  Model.prototype.save = function() {
+  Model.prototype.save = function(forceCreate) {
+    if (!this.__service) {
+      return Promise.resolve({
+        id: this.get('id')
+      });
+    }
+
     let data = this.get({
       copy: true
     });
 
-    if (data.id) {
+    if (data.id && !forceCreate) {
       return this.__service.update(data.id, data);
     }
     else {
       return this.__service.insert(data);
     }
+  };
+
+  /**
+   * Delete model data
+   *
+   * @method delete
+   *
+   * @overwritable
+   * @return {object} Returns a promise
+   */
+  Model.prototype.delete = function() {
+    if (!this.__service) {
+      const id = this.get('id');
+      this.properties = {};
+      return Promise.resolve({
+        id: id
+      });
+    }
+
+    return this.__service.delete(this.get('id'));
   };
 
   /**

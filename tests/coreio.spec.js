@@ -139,7 +139,7 @@ describe('CoreIO', function() {
     });
   });
 
-  describe.only('api', function() {
+  describe('api', function() {
     it('registers an API route', function() {
       let TestModel = CoreIO.createModel('test', {
         defaults: { foo: 'bar' }

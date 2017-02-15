@@ -2,6 +2,7 @@
 
 import Utils from './utils';
 import Socket from './socket';
+import Router from './router';
 
 const CoreIO = {
   logLevel: 'sys',
@@ -17,13 +18,13 @@ Utils(CoreIO);
 CoreIO.Event = require('./event')(CoreIO);
 CoreIO.List = require('./list')(CoreIO);
 CoreIO.Model = require('./model')(CoreIO);
-CoreIO.Router = require('./router')(CoreIO);
 CoreIO.ReadyState = require('./readystate')(CoreIO);
 CoreIO.Service = require('./service')(CoreIO);
 CoreIO.SyncList = require('./synclist')(CoreIO);
 CoreIO.SyncModel = require('./syncmodel')(CoreIO);
 
 CoreIO.Socket = Socket(CoreIO);
+CoreIO.Router = Router(CoreIO);
 /**
  * Creates a model class
  *
