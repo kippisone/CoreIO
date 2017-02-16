@@ -103,16 +103,6 @@ CoreIO.createRouter = function(slug) {
 CoreIO.api = function(slug, conf) {
   conf.slug = slug;
   let router = new CoreIO.Router(conf);
-  if (typeof model === 'string') {
-    return router.route(model);
-  }
-
-  if (model instanceof CoreIO.Model) {
-    router.coupleModel(model);
-  }
-  else if (model instanceof CoreIO.List) {
-    router.coupleList(model);
-  }
 
   return router;
 }

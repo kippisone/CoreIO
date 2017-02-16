@@ -29,7 +29,9 @@ export default function Router(CoreIO) {
 
       conf = conf || {};
       if (!isConnected) {
-        this.connect();
+        this.connect({
+          noServer: conf.noServer || false
+        });
       }
 
       this.registerRoutes(conf);
@@ -163,66 +165,6 @@ export default function Router(CoreIO) {
 
     route(slug) {
       return app.route(slug);
-    }
-
-    coupleModel(model) {
-      let slug = this.conf.slug || model.name.replace(/Model$/, '');
-      if (slug.charAt(0) !== '/') {
-        slug = '/' + slug;
-      }
-
-      log.sys('Register API on path ', slug);
-      let router = express.Router();
-      if (this.conf.allow) {
-        if (this.conf.allow.indexOf('READ') !== -1) {
-          log.sys(`Register GET route for model ${model.name}`);
-          router.get('/:id', (req, res) => {
-            this.requestHandler(req, res, model.fetch(req.params.id).then(() => {
-              return model.get();
-            }));
-          });
-        }
-
-        if (this.conf.allow.indexOf('CREATE') !== -1) {
-          log.sys(`Register POST route for model ${model.name}`);
-          router.post((req, res) => {
-            this.requestHandler(req, res, model.set(req.body));
-          });
-        }
-      }
-
-      app.use(slug, router);
-      return router;
-    }
-
-    coupleList(list) {
-      let slug = this.conf.slug || list.name.replace(/Model$/, '');
-      if (slug.charAt(0) !== '/') {
-        slug = '/' + slug;
-      }
-
-      log.sys('Register API on path ', slug);
-      let router = express.Router();
-      if (this.conf.allow) {
-        if (this.conf.allow.indexOf('READ') !== -1) {
-          log.sys(`Register GET route for list ${list.name}`);
-          router.get('/:id', (req, res) => {
-            this.requestHandler(req, res, list.fetch(req.params.id).then(() => {
-              return list.get();
-            }));
-          });
-        }
-
-        if (this.conf.allow.indexOf('CREATE') !== -1) {
-          log.sys(`Register POST route for list ${list.name}`);
-          router.post('/', (req, res) => {
-            this.requestHandler(req, res, list.push(req.body));
-          });
-        }
-      }
-
-      app.use(slug, router);
-      return router;
     }
   }
 
