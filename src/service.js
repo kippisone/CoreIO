@@ -147,11 +147,36 @@ module.exports = function(CoreIO) {
    * Fetch model data
    *
    * @method fetch
+   * @deprecated Use find or findOne
    *
    * @overwritable
    * @return {object} Returns a promise
    */
   Service.prototype.fetch = function () {
+    return Promise.resolve();
+  };
+
+  /**
+   * Find model data
+   *
+   * @method find
+   *
+   * @overwritable
+   * @return {object} Returns a promise
+   */
+  Service.prototype.find = function () {
+    return Promise.resolve();
+  };
+
+  /**
+   * Find one item
+   *
+   * @method findOne
+   *
+   * @overwritable
+   * @return {object} Returns a promise
+   */
+  Service.prototype.findOne = function () {
     return Promise.resolve();
   };
 
@@ -165,6 +190,18 @@ module.exports = function(CoreIO) {
    */
   Service.prototype.delete = function () {
     return Promise.resolve();
+  };
+
+  /**
+   * Deletes model data
+   *
+   * @method delete
+   *
+   * @overwritable
+   * @return {object} Returns a promise
+   */
+  Service.prototype.then = function (fn) {
+    return new Promise(resolve => resolve()).then(fn);
   };
 
   //--

@@ -119,8 +119,9 @@ describe.only('Router', () => {
     });
   });
 
-  describe('registerModel', () => {
+  describe('createConfig', () => {
     let TestModel;
+    let TestList;
 
     before(() => {
       TestModel = CoreIO.createModel('test', {
@@ -128,6 +129,13 @@ describe.only('Router', () => {
           id: 1328,
           foo: 'bar'
         }
+      });
+
+      TestList = CoreIO.createList('test', {
+        defaults: [{
+          id: 1328,
+          foo: 'bar'
+        }]
       });
     });
 
@@ -139,7 +147,7 @@ describe.only('Router', () => {
       };
 
       const router = new Router();
-      inspect(router.registerModel(conf)).isEql([{
+      inspect(router.createConfig(conf)).isEql([{
         slug: '/test/:id',
         get: inspect.match.func
       }, {
@@ -156,11 +164,43 @@ describe.only('Router', () => {
         delete: inspect.match.func
       }]);
     });
-  });
 
+    it('create a route conf from list', () => {
+     const conf = {
+       slug: '/test',
+       list: TestList,
+       allow: ['READ']
+     };
+
+     const router = new Router();
+     inspect(router.createConfig(conf)).isEql([{
+       slug: '/test',
+       get: inspect.match.func
+     }]);
+    });
+
+    it('create a route conf with list and modle', () => {
+     const conf = {
+       slug: '/test',
+       model: TestModel,
+       list: TestList,
+       allow: ['READ']
+     };
+
+     const router = new Router();
+     inspect(router.createConfig(conf)).isEql([{
+       slug: '/test/:id',
+       get: inspect.match.func
+     }, {
+      slug: '/test',
+      get: inspect.match.func
+     }]);
+    });
+  });
 
   describe('model', () => {
     let TestModel;
+    let TestList;
 
     before(() => {
       TestModel = CoreIO.createModel('test', {
@@ -168,6 +208,19 @@ describe.only('Router', () => {
           id: 1328,
           foo: 'bar'
         }
+      });
+
+      TestList = CoreIO.createList('test', {
+        defaults: [{
+          id: 1328,
+          foo: 'bar'
+        }, {
+          id: 1329,
+          foo: 'bla'
+        }, {
+          id: 1330,
+          foo: 'blub'
+        }]
       });
     });
 
@@ -266,6 +319,31 @@ describe.only('Router', () => {
         ctx.responseTime(50);
 
         inspect(ctx.body).isEql({ id: 1328 });
+      });
+    });
+
+    it('registers a list get route', () => {
+      const router = new Router({
+        list: TestList,
+        slug: '/test'
+      });
+
+      inspect(router).isObject();
+
+      return apiInspect.get('/test').test((ctx) => {
+        ctx.statusCode(200);
+        ctx.contentType('application/json');
+        ctx.responseTime(50);
+        inspect(ctx.body).isEql([{
+          id: 1328,
+          foo: 'bar'
+        }, {
+          id: 1329,
+          foo: 'bla'
+        }, {
+          id: 1330,
+          foo: 'blub'
+        }]);
       });
     });
   });

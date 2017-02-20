@@ -121,7 +121,7 @@ module.exports = function(CoreIO) {
 
       let Service = this.service;
       this.__service = new Service(serviceConf);
-      log.info('Connect model with service', Service.name);
+      log.info('Connect model with service', serviceConf.name);
       this.__service.then(() => {
         log.sys('... service succesfully connected!');
         if (this.autoSave) {
@@ -265,7 +265,7 @@ module.exports = function(CoreIO) {
       log.info('Set value', key, value, oldData);
     }
     else {
-      this.warn('Data are incorrect in model.set()', arguments);
+      log.warn('Data are incorrect in model.set()', arguments);
     }
 
     options = options || {};
@@ -787,7 +787,7 @@ module.exports = function(CoreIO) {
       order;
 
     if (!Array.isArray(data)) {
-      this.warn('Could not sort data of type', typeof data);
+      log.warn('Could not sort data of type', typeof data);
       return [];
     }
 
@@ -1034,7 +1034,7 @@ module.exports = function(CoreIO) {
    * @param {Object} data Form data
    */
   Model.prototype.setData = function(data, caller) {
-    this.warn('Model.setData has been deprecated since v0.9');
+    log.warn('Model.setData has been deprecated since v0.9');
     this.set(data, {
       extend: true
     });
@@ -1252,12 +1252,14 @@ module.exports = function(CoreIO) {
 
   Model.prototype.fetch = function() {
     if (this.__service) {
-      log.info('Fetch data from service');
+      log.info('Fetch data from model service');
       let args = Array.prototype.slice.call(arguments);
-      return this.__service.fetch.apply(this.__service, args).then(data => {
+      return this.__service.findOne.apply(this.__service, args).then(data => {
         this.set(data, {
           noAutoSave: true
         });
+
+        return data;
       });
     }
 

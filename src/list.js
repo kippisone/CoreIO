@@ -113,6 +113,26 @@ module.exports = function(CoreIO) {
       });
     }
 
+    // initialize service
+    if (this.service) {
+      let serviceConf = {
+        name: this.collection || this.table || this.shortName
+      };
+
+      let Service = this.service;
+      this.__service = new Service(serviceConf);
+      log.info('Connect list with service', serviceConf.name);
+      this.__service.then(() => {
+        log.sys('... service succesfully connected!');
+        if (this.autoSave) {
+          this.fetch();
+        }
+      }).catch(err => {
+        log.error('... service connection failed!', err);
+      });
+
+    }
+
     this.state('ready');
   };
 
@@ -643,6 +663,22 @@ module.exports = function(CoreIO) {
 
     return result;
   };
+
+  List.prototype.fetch = function() {
+    if (this.__service) {
+      log.info('Fetch data from list service');
+      let args = Array.prototype.slice.call(arguments);
+      return this.__service.find.apply(this.__service, args).then(data => {
+        this.push(data, {
+          noAutoSave: true
+        });
+
+        return data;
+      });
+    }
+
+    return Promise.resolve(this.toArray());
+  }
 
   //--
 
