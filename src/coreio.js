@@ -102,7 +102,11 @@ CoreIO.createRouter = function(slug) {
 
 CoreIO.api = function(slug, conf) {
   conf.slug = slug;
-  let router = new CoreIO.Router(conf);
+  let router = new CoreIO.Router({
+    noServer: conf.noServer || false
+  });
+
+  router.registerRoutes(conf);
 
   return router;
 }
@@ -136,6 +140,26 @@ CoreIO.getConf = function(name, defaultValue) {
 
 CoreIO.setConf = function(name, value) {
   CoreIO.conf[name] = value;
+}
+
+CoreIO.htmlPage = function(route, data, conf) {
+  conf = conf || {};
+  let router = new CoreIO.Router({
+    noServer: conf.noServer || false
+  });
+
+  router.registerHTMLPage(route, 'html', Object.assign({
+    title: 'CoreIO html page',
+    scripts: [],
+    styles: []
+  }, data));
+  return router;
+};
+
+CoreIO.staticDir = function(dir, conf) {
+  const router = new CoreIO.Router(conf);
+  router.registerStaticDir(dir);
+  return router;
 }
 
 module.exports = CoreIO;

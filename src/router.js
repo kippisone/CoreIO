@@ -12,9 +12,11 @@
 
 'use strict';
 
+import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
 import logtopus from 'logtopus';
+import firetpl from 'firetpl';
 
 const app = express();
 let isConnected = false;
@@ -34,7 +36,7 @@ export default function Router(CoreIO) {
         });
       }
 
-      this.registerRoutes(conf);
+      this.connect = (_options) => Router.connect(_options);
     }
 
     static connect(options) {
@@ -55,12 +57,21 @@ export default function Router(CoreIO) {
         logLevel: CoreIO.logLevel
       }));
 
+      app.engine('.fire', firetpl.__express);
+      app.set('views', path.join(__dirname, '../views'));
+      app.set('view engine', 'fire');
+
       if (!options.noServer) {
         log.sys('Listen on port', CoreIO.httpPort);
         app.listen(CoreIO.httpPort, CoreIO.httpHost);
       }
 
       return app;
+    }
+
+    registerStaticDir(dir) {
+      const app = this.connect();
+      app.use(express.static(dir));
     }
 
     registerRoutes(conf) {
@@ -83,6 +94,13 @@ export default function Router(CoreIO) {
           }
         }
       }
+    }
+
+    registerHTMLPage(slug, view, data) {
+      const app = this.connect();
+      app.get(slug, function(req, res) {
+        res.render(view, data);
+      });
     }
 
     createConfig(conf) {
