@@ -36,6 +36,10 @@ export default function Router(CoreIO) {
         });
       }
 
+      if (conf.slug) {
+        this.registerRoutes(conf);
+      }
+
       this.connect = (_options) => Router.connect(_options);
     }
 
