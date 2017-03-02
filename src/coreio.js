@@ -2,6 +2,7 @@
 
 import Utils from './utils';
 import Socket from './socket';
+import Service from './service';
 import Router from './router';
 
 const CoreIO = {
@@ -19,10 +20,10 @@ CoreIO.Event = require('./event')(CoreIO);
 CoreIO.List = require('./list')(CoreIO);
 CoreIO.Model = require('./model')(CoreIO);
 CoreIO.ReadyState = require('./readystate')(CoreIO);
-CoreIO.Service = require('./service')(CoreIO);
 CoreIO.SyncList = require('./synclist')(CoreIO);
 CoreIO.SyncModel = require('./syncmodel')(CoreIO);
 
+CoreIO.Service = Service(CoreIO);
 CoreIO.Socket = Socket(CoreIO);
 CoreIO.Router = Router(CoreIO);
 /**
@@ -100,6 +101,16 @@ CoreIO.createRouter = function(slug) {
   return router;
 };
 
+/**
+ * Register a API route
+ *
+ * @method api
+ *
+ * @param  {string} slug Router
+ * @param  {object} conf Route configuration
+ *
+ * @return {object} Returns a router instance
+ */
 CoreIO.api = function(slug, conf) {
   conf.slug = slug;
   let router = new CoreIO.Router({
