@@ -1,6 +1,6 @@
 {
   "name": "coreio",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Core.io is a model list framework and builds the backend part of XQCore",
   "main": "lib/coreio.js",
   "scripts": {
