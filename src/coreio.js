@@ -3,6 +3,7 @@
 import Utils from './utils';
 import Socket from './socket';
 import Service from './service';
+import Server from './server';
 import Router from './router';
 
 const CoreIO = {
@@ -24,8 +25,10 @@ CoreIO.SyncList = require('./synclist')(CoreIO);
 CoreIO.SyncModel = require('./syncmodel')(CoreIO);
 
 CoreIO.Service = Service(CoreIO);
+CoreIO.Server = Server(CoreIO);
 CoreIO.Socket = Socket(CoreIO);
 CoreIO.Router = Router(CoreIO);
+
 /**
  * Creates a model class
  *
@@ -167,10 +170,14 @@ CoreIO.htmlPage = function(route, data, conf) {
   return router;
 };
 
-CoreIO.staticDir = function(dir, conf) {
-  const router = new CoreIO.Router(conf);
-  router.registerStaticDir(dir);
-  return router;
+CoreIO.staticDir = function(dir) {
+  const server = new CoreIO.Server({
+    port: CoreIO.getConf('httpPort'),
+    host: CoreIO.getConf('httpHost')
+  });
+
+  server.registerStaticDir(dir);
+  return server;
 }
 
 module.exports = CoreIO;

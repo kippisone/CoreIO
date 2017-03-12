@@ -12,11 +12,7 @@
 
 'use strict';
 
-import path from 'path';
-import express from 'express';
-import bodyParser from 'body-parser';
 import logtopus from 'logtopus';
-import firetpl from 'firetpl';
 
 const app = express();
 let isConnected = false;
@@ -40,42 +36,14 @@ export default function Router(CoreIO) {
         this.registerRoutes(conf);
       }
 
-      this.connect = (_options) => Router.connect(_options);
-    }
-
-    static connect(options) {
-      if (isConnected) {
-        return app;
-      }
-
-      options = options || {};
-      isConnected = true;
-      app.use(bodyParser.json());
-      app.use((req, res, next) => {
-        res.set('Access-Control-Allow-Origin', '*');
-        res.set('Access-Control-Allow-Headers', 'content-type');
-        next();
+      const server = new CoreIO.Server({
+        port: CoreIO.getConf('httpPort'),
+        host: CoreIO.getConf('httpHost'),
+        noServer: conf.noServer
       });
 
-      app.use(logtopus.express({
-        logLevel: CoreIO.logLevel
-      }));
-
-      app.engine('.fire', firetpl.__express);
-      app.set('views', path.join(__dirname, '../views'));
-      app.set('view engine', 'fire');
-
-      if (!options.noServer) {
-        log.sys('Listen on port', CoreIO.httpPort);
-        app.listen(CoreIO.httpPort, CoreIO.httpHost);
-      }
-
-      return app;
-    }
-
-    registerStaticDir(dir) {
-      const app = this.connect();
-      app.use(express.static(dir));
+      this.server = server;
+      this.app = server.app;
     }
 
     registerRoutes(conf) {
@@ -98,6 +66,8 @@ export default function Router(CoreIO) {
           }
         }
       }
+
+      return this;
     }
 
     registerHTMLPage(slug, view, data) {
