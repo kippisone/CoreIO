@@ -21,6 +21,7 @@ CoreIO.Event = require('./event')(CoreIO);
 CoreIO.List = require('./list')(CoreIO);
 CoreIO.Model = require('./model')(CoreIO);
 CoreIO.ReadyState = require('./readystate')(CoreIO);
+CoreIO.Service = require('./service')(CoreIO);
 CoreIO.SyncList = require('./synclist')(CoreIO);
 CoreIO.SyncModel = require('./syncmodel')(CoreIO);
 
@@ -156,6 +157,22 @@ CoreIO.setConf = function(name, value) {
   CoreIO.conf[name] = value;
 }
 
+/**
+ * Register a HTML skeleton page
+ *
+ * data:
+ * ```js
+ * {
+ *   title: 'page title',  // Pag title
+ *   scripts: ['main.js'], // JS files
+ *   styles: ['main.css']  // CSS files
+ * }
+ * ```
+ * @param  {route} route HTML page route
+ * @param  {object} data  page data
+ * @param  {object} conf  Router configuration
+ * @return {object}       Returns a Router instance
+ */
 CoreIO.htmlPage = function(route, data, conf) {
   conf = conf || {};
   let router = new CoreIO.Router({
@@ -170,6 +187,12 @@ CoreIO.htmlPage = function(route, data, conf) {
   return router;
 };
 
+/**
+ * Register a static dir
+ * @param  {string} dir  Dirname
+ * @param  {object} conf Router configuration
+ * @return {object}      Returns a Router object
+ */
 CoreIO.staticDir = function(dir) {
   const server = new CoreIO.Server({
     port: CoreIO.getConf('httpPort'),
