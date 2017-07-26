@@ -14,8 +14,6 @@
 
 import logtopus from 'logtopus';
 
-const app = express();
-let isConnected = false;
 const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete'];
 
 export default function Router(CoreIO) {
@@ -26,11 +24,11 @@ export default function Router(CoreIO) {
       log.setLevel(CoreIO.logLevel);
 
       conf = conf || {};
-      if (!isConnected) {
-        Router.connect({
-          noServer: conf.noServer || false
-        });
-      }
+      // if (!isConnected) {
+      //   Router.connect({
+      //     noServer: conf.noServer || false
+      //   });
+      // }
 
       if (conf.slug) {
         this.registerRoutes(conf);
@@ -71,7 +69,7 @@ export default function Router(CoreIO) {
     }
 
     registerHTMLPage(slug, view, data) {
-      const app = this.connect();
+      const app = this.app;
       app.get(slug, function(req, res) {
         res.render(view, data);
       });
@@ -176,7 +174,7 @@ export default function Router(CoreIO) {
     }
 
     route(slug) {
-      return app.route(slug);
+      return this.app.route(slug);
     }
   }
 
