@@ -159,17 +159,25 @@ export default function Router(CoreIO) {
       return (req, res, next) => {
         const p = typeof fn === 'object' ? fn : fn(req, res, next);
         if (!p) {
-          return;
+          if (p === '') {
+            res.status(204)
+            res.end()
+          }
+
+          return
         }
 
         if (typeof p.then === 'function' && typeof p.catch === 'function') {
           p.then((data) => {
             res.status(200);
-            res.json(data);
+            typeof data === 'object' && req.accepts('json') ? res.json(data) : data;
           }).catch((err) => {
             res.status(err.statusCode || 500);
             res.send(err.message);
           });
+        } else {
+          res.status(200)
+          typeof p === 'object' && req.accepts('json') ? res.json(p) : p;
         }
       };
     }
