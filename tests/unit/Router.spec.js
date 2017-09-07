@@ -1,30 +1,80 @@
-'use strict';
+const inspect = require('inspect.js')
+const sinon = require('sinon')
+const apiInspect = require('api-inspect')
+inspect.useSinon(sinon)
 
-const inspect = require('inspect.js');
-const apiInspect = require('api-inspect');
-const sinon = require('sinon');
-inspect.useSinon(sinon);
+const CoreIO = require('../../')
 
-const CoreIO = require('../lib/coreio');
-CoreIO.logLevel = 'error';
-const Router = CoreIO.Router;
-
-apiInspect.setApi(Router.connect({
-  noServer: true
-}));
+const log = require('logtopus').getLogger('coreio')
+log.setLevel('error')
 
 describe.only('Router', () => {
   describe('class', () => {
-    it('is a Router class', () => {
-      inspect(new Router()).isInstanceOf(Router);
-    });
-  });
+    it.skip('should be a class', () => {
+      inspect(CoreIO.Router).isClass()
+    })
+  })
+
+  describe('instance', () => {
+    it('has an app and server object', () => {
+      const router = new CoreIO.Router({
+        noServer: true
+      })
+
+      inspect(router).isInstanceOf(CoreIO.Router)
+      inspect(router).hasKeys(['app', 'server'])
+    })
+
+    it('uses a sub router', () => {
+      const router = new CoreIO.Router({
+        noServer: true,
+        mount: '/foo'
+      })
+
+      inspect(router).hasKey('Router')
+    })
+  })
+
+  describe('route()', () => {
+    it('registers a route', () => {
+      const router = new CoreIO.Router({
+        noServer: true
+      })
+
+      const r = router.route('/bar')
+      inspect(r).isObject()
+      inspect(r).hasMethod('get')
+      inspect(r).hasMethod('post')
+    })
+
+    it('registers a route with mount path', () => {
+      const router = new CoreIO.Router({
+        noServer: true,
+        mount: '/foo'
+      })
+
+      const r = router.route('/bar')
+      inspect(r).isObject()
+      inspect(r).hasMethod('get')
+      inspect(r).hasMethod('post')
+    })
+  })
 
   describe('registerRoutes', () => {
+    let router;
+
+    beforeEach(() => {
+      router = new CoreIO.Router({
+        noServer: true
+      })
+
+      apiInspect.setApi(router.app)
+    })
+
     it('registers a get route', () => {
       const getStub = sinon.stub();
       getStub.returns(Promise.resolve({ foo: 'bar' }));
-      const router = new Router({
+      router.registerRoutes({
         get: getStub,
         slug: '/foo'
       });
@@ -41,7 +91,7 @@ describe.only('Router', () => {
     it('registers a post route', () => {
       const postStub = sinon.stub();
       postStub.returns(Promise.resolve({ foo: 'bar' }));
-      const router = new Router({
+      router.registerRoutes({
         post: postStub,
         slug: '/foo'
       });
@@ -61,7 +111,7 @@ describe.only('Router', () => {
     it('registers a put route', () => {
       const putStub = sinon.stub();
       putStub.returns(Promise.resolve({ foo: 'bar' }));
-      const router = new Router({
+      router.registerRoutes({
         put: putStub,
         slug: '/foo'
       });
@@ -81,7 +131,7 @@ describe.only('Router', () => {
     it('registers a patch route', () => {
       const patchStub = sinon.stub();
       patchStub.returns(Promise.resolve({ id: 1328 }));
-      const router = new Router({
+      router.registerRoutes({
         patch: patchStub,
         slug: '/foo'
       });
@@ -101,7 +151,7 @@ describe.only('Router', () => {
     it('registers a delete route', () => {
       const deleteStub = sinon.stub();
       deleteStub.returns(Promise.resolve({ id: 1328 }));
-      const router = new Router({
+      router.registerRoutes({
         delete: deleteStub,
         slug: '/foo'
       });
@@ -117,7 +167,7 @@ describe.only('Router', () => {
         inspect(ctx.body).isEql({ id: 1328 });
       });
     });
-  });
+  })
 
   describe('createConfig', () => {
     let TestModel;
@@ -146,7 +196,7 @@ describe.only('Router', () => {
         allow: ['READ', 'CREATE', 'UPDATE', 'DELETE']
       };
 
-      const router = new Router();
+      const router = new CoreIO.Router();
       inspect(router.createConfig(conf)).isEql([{
         slug: '/test/:id',
         get: inspect.match.func
@@ -172,7 +222,7 @@ describe.only('Router', () => {
        allow: ['READ']
      };
 
-     const router = new Router();
+     const router = new CoreIO.Router();
      inspect(router.createConfig(conf)).isEql([{
        slug: '/test',
        get: inspect.match.func
@@ -187,7 +237,7 @@ describe.only('Router', () => {
        allow: ['READ']
      };
 
-     const router = new Router();
+     const router = new CoreIO.Router();
      inspect(router.createConfig(conf)).isEql([{
        slug: '/test/:id',
        get: inspect.match.func
@@ -199,16 +249,17 @@ describe.only('Router', () => {
   });
 
   describe('model', () => {
-    let TestModel;
-    let TestList;
+    let TestModel
+    let TestList
+    let router
 
-    before(() => {
+    beforeEach(() => {
       TestModel = CoreIO.createModel('test', {
         defaults: {
           id: 1328,
           foo: 'bar'
         }
-      });
+      })
 
       TestList = CoreIO.createList('test', {
         defaults: [{
@@ -221,30 +272,34 @@ describe.only('Router', () => {
           id: 1330,
           foo: 'blub'
         }]
-      });
-    });
+      })
+
+      router = new CoreIO.Router({
+        noServer: true
+      })
+    })
 
     it('registers a model get route', () => {
-      const router = new Router({
+      router.registerRoutes({
         model: TestModel,
         slug: '/test'
-      });
+      })
 
-      inspect(router).isObject();
+      inspect(router).isObject()
 
       return apiInspect.get('/test/1328').test((ctx) => {
-        ctx.statusCode(200);
-        ctx.contentType('application/json');
-        ctx.responseTime(50);
+        ctx.statusCode(200)
+        ctx.contentType('application/json')
+        ctx.responseTime(50)
         inspect(ctx.body).isEql({
           id: 1328,
           foo: 'bar'
-        });
-      });
-    });
+        })
+      })
+    })
 
     it('registers a model post route', () => {
-      const router = new Router({
+      router.registerRoutes({
         model: TestModel,
         slug: '/test',
         allow: ['CREATE']
@@ -267,7 +322,7 @@ describe.only('Router', () => {
     });
 
     it('registers a model put route', () => {
-      const router = new Router({
+      router.registerRoutes({
         model: TestModel,
         slug: '/test',
         allow: ['UPDATE']
@@ -286,7 +341,7 @@ describe.only('Router', () => {
     });
 
     it('registers a model patch route', () => {
-      const router = new Router({
+      router.registerRoutes({
         model: TestModel,
         slug: '/test',
         allow: ['UPDATE']
@@ -305,7 +360,7 @@ describe.only('Router', () => {
     });
 
     it('registers a model delete route', () => {
-      const router = new Router({
+      router.registerRoutes({
         model: TestModel,
         slug: '/test',
         allow: ['DELETE']
@@ -323,10 +378,10 @@ describe.only('Router', () => {
     });
 
     it('registers a list get route', () => {
-      const router = new Router({
+      router.registerRoutes({
         list: TestList,
         slug: '/test'
-      });
+      })
 
       inspect(router).isObject();
 
@@ -347,4 +402,4 @@ describe.only('Router', () => {
       });
     });
   });
-});
+})

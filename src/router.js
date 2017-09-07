@@ -1,18 +1,21 @@
 /**
+ * Router module
+ *
  * @module Router
  *
  * @example {js}
- * const router = new CoreIO.Router({
+ * const router = new CoreIO.Router();
+ * router.registerRoutes({
  *   slug: '/foo',
  *   get: (ctx) => {
  *     return Promise.resolve('Foo');
  *   }
- * });
+ * })
  */
 
 'use strict';
 
-import logtopus from 'logtopus';
+import express from 'express';
 
 const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete'];
 
@@ -21,18 +24,7 @@ export default function Router(CoreIO) {
 
   class Router {
     constructor(conf) {
-      log.setLevel(CoreIO.logLevel);
-
       conf = conf || {};
-      // if (!isConnected) {
-      //   Router.connect({
-      //     noServer: conf.noServer || false
-      //   });
-      // }
-
-      if (conf.slug) {
-        this.registerRoutes(conf);
-      }
 
       const server = new CoreIO.Server({
         port: CoreIO.getConf('httpPort'),
@@ -42,6 +34,15 @@ export default function Router(CoreIO) {
 
       this.server = server;
       this.app = server.app;
+
+      if (conf.mount) {
+        this.Router = express.Router()
+        this.app.use(conf.mount, this.Router)
+      }
+
+      if (conf.slug) {
+        this.registerRoutes(conf);
+      }
     }
 
     registerRoutes(conf) {
@@ -174,7 +175,11 @@ export default function Router(CoreIO) {
     }
 
     route(slug) {
-      return this.app.route(slug);
+      if (this.Router) {
+        return this.Router.route(slug)
+      }
+
+      return this.app.route(slug)
     }
   }
 
