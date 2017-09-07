@@ -17,15 +17,15 @@ export default function ServerFactory(CoreIO) {
       this.host = conf.host || '0.0.0.0';
 
       if (_registeredServers[this.port]) {
-        this.app = _registeredServers[conf.port];
+        this.app = _registeredServers[this.port];
       } else {
         this.app = express();
-        _registeredServers[conf.port] = this.app;
-      }
+        _registeredServers[this.port] = this.app;
 
-      this.connect({
-        noServer: conf.noServer
-      });
+        this.connect({
+          noServer: conf.noServer
+        });
+      }
     }
 
     connect(options) {
@@ -48,7 +48,7 @@ export default function ServerFactory(CoreIO) {
     }
 
     getCorsOoptions() {
-      
+
     }
 
     registerStaticDir(dir) {
