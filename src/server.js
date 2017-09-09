@@ -9,18 +9,20 @@ import firetpl from 'firetpl';
 
 export default function ServerFactory(CoreIO) {
   let log = require('logtopus').getLogger('coreio');
-  const _registeredServers = {};
+  const _registeredServers = new Map();
 
   class Server {
     constructor(conf) {
       this.port = conf.port;
       this.host = conf.host || '0.0.0.0';
 
-      if (_registeredServers[this.port]) {
-        this.app = _registeredServers[this.port];
+      const portNumber = `${this.port}`
+
+      if (_registeredServers.has(portNumber)) {
+        this.app = _registeredServers.get(portNumber);
       } else {
         this.app = express();
-        _registeredServers[this.port] = this.app;
+        _registeredServers.set(portNumber, this.app);
 
         this.connect({
           noServer: conf.noServer

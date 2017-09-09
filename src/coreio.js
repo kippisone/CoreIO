@@ -7,7 +7,7 @@ import Server from './server';
 import Router from './router';
 
 const CoreIO = {
-  logLevel: 'sys',
+  logLevel: process.env.NODE_ENV === 'test' ? 'error' : 'sys',
   socketPort: 9889,
   socketHost: '0.0.0.0',
   httpPort: 6446,

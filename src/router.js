@@ -160,6 +160,7 @@ export default function Router(CoreIO) {
         const p = typeof fn === 'object' ? fn : fn(req, res, next);
         if (!p) {
           if (p === '') {
+            res.type('text/plain')
             res.status(204)
             res.end()
           }
