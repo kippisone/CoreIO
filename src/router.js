@@ -193,7 +193,12 @@ export default function Router(CoreIO) {
 
     removeRoute(path) {
       let i = 0
-      for (const layer of this.app._router.stack) {
+      while (true) {
+        const layer = this.app._router.stack[i]
+        if (!layer) {
+          break
+        }
+
         if (layer.path === path) {
           this.app._router.stack.splice(i, 1)
         } else {
@@ -204,7 +209,12 @@ export default function Router(CoreIO) {
 
     resetRoutes() {
       let i = 0
-      for (const layer of this.app._router.stack) {
+      while (true) {
+        const layer = this.app._router.stack[i]
+        if (!layer) {
+          break
+        }
+
         if (layer.name === 'bound dispatch') {
           this.app._router.stack.splice(i, 1)
         } else {
