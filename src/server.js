@@ -47,6 +47,8 @@ export default function ServerFactory(CoreIO) {
         log.sys('Listen on port', CoreIO.httpPort);
         app.listen(CoreIO.httpPort, CoreIO.httpHost);
       }
+
+      CoreIO.CoreEvents.emit('server:init', this);
     }
 
     getCorsOoptions() {

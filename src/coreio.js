@@ -30,6 +30,8 @@ CoreIO.Server = Server(CoreIO);
 CoreIO.Socket = Socket(CoreIO);
 CoreIO.Router = Router(CoreIO);
 
+CoreIO.CoreEvents = new CoreIO.Event();
+
 /**
  * Creates a model class
  *
