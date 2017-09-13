@@ -48,6 +48,12 @@ export default function ServerFactory(CoreIO) {
         app.listen(CoreIO.httpPort, CoreIO.httpHost);
       }
 
+      /**
+       * Fires an event when a server instance has been initialized
+       *
+       * @event server:init
+       * @arg {obj} instance The fresh created CoreIO.Server instance
+       */
       CoreIO.CoreEvents.emit('server:init', this);
     }
 

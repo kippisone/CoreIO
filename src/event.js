@@ -56,8 +56,6 @@ module.exports = function(CoreIO) {
     };
   };
 
-
-
   /**
    * Event emitter constructor
    *
