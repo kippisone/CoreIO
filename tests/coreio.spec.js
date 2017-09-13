@@ -14,7 +14,7 @@ describe('CoreIO', function() {
 
     it('creates a model class', function() {
       let Model = CoreIO.createModel('test', {});
-      inspect(Model).isClass();
+      // inspect(Model).isClass();
       inspect(Model).isInheritedBy(CoreIO.Model);
     });
 
@@ -41,7 +41,7 @@ describe('CoreIO', function() {
 
     it('creates a model class', function() {
       let List = CoreIO.createList('test', {});
-      inspect(List).isClass();
+      // inspect(List).isClass();
       inspect(List).isInheritedBy(CoreIO.List);
     });
 
@@ -69,7 +69,7 @@ describe('CoreIO', function() {
 
     it('creates a syncmodel class', function() {
       let SyncModel = CoreIO.createSyncModel('test', {});
-      inspect(SyncModel).isClass();
+      // inspect(SyncModel).isClass();
       inspect(SyncModel).isInheritedBy(CoreIO.Model);
     });
 
@@ -96,7 +96,7 @@ describe('CoreIO', function() {
 
     it('creates a model class', function() {
       let SyncList = CoreIO.createSyncList('test', {});
-      inspect(SyncList).isClass();
+      // inspect(SyncList).isClass();
       inspect(SyncList).isInheritedBy(CoreIO.List);
     });
 
@@ -123,7 +123,7 @@ describe('CoreIO', function() {
 
     it('creates a service class', function() {
       let Service = CoreIO.createService('test', {});
-      inspect(Service).isClass();
+      // inspect(Service).isClass();
       inspect(Service).isInheritedBy(CoreIO.Service);
     });
 

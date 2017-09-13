@@ -4,7 +4,7 @@
   "description": "Core.io is a model list framework and builds the backend part of XQCore",
   "main": "lib/coreio.js",
   "scripts": {
-    "test": "mocha --reporter lagoon-reporter tests/**/*.spec.js",
+    "test": "mocha --reporter lagoon-reporter tests/*.spec.js tests/**/*.spec.js",
     "build": "babel src -d lib",
     "dev": "babel src -d lib --watch"
   },

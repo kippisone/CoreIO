@@ -190,6 +190,28 @@ export default function Router(CoreIO) {
 
       return this.app.route(slug)
     }
+
+    removeRoute(path) {
+      let i = 0
+      for (const layer of this.app._router.stack) {
+        if (layer.path === path) {
+          this.app._router.stack.splice(i, 1)
+        } else {
+          i += 1
+        }
+      }
+    }
+
+    resetRoutes() {
+      let i = 0
+      for (const layer of this.app._router.stack) {
+        if (layer.name === 'bound dispatch') {
+          this.app._router.stack.splice(i, 1)
+        } else {
+          i += 1
+        }
+      }
+    }
   }
 
   return Router;

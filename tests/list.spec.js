@@ -323,7 +323,7 @@ describe('CoreIO List', function() {
       inspect(list.sync).wasCalledWith('push', sinon.match.array);
       var models = list.sync.firstCall.args[1];
       inspect(models).isArray();
-      inspect(models[0].properties).isEql({
+      inspect(models[0]).isEql({
         a: 'AA',
         b: 'BB'
       });
@@ -349,17 +349,17 @@ describe('CoreIO List', function() {
       inspect(list.sync).wasCalledWith('push', sinon.match.array);
       var models = list.sync.firstCall.args[1];
       inspect(models).isArray();
-      inspect(models[0].properties).isEql({
+      inspect(models[0]).isEql({
         a: 'AA',
         b: 'BB'
       });
 
-      inspect(models[1].properties).isEql({
+      inspect(models[1]).isEql({
         a: 'CC',
         b: 'DD'
       });
 
-      inspect(models[2].properties).isEql({
+      inspect(models[2]).isEql({
         a: 'EE',
         b: 'FF'
       });

@@ -70,7 +70,7 @@ module.exports = function(CoreIO) {
 
       socketServer.connections = [];
       socketServer.channels = {};
-      var server = CoreIO.getHttpServer(CoreIO.socketHost, CoreIO.socketPort);
+      var server = CoreIO.getHttpServer(this.host, this.port);
 
       socketServer.installHandlers(server, { prefix: '/' + this.path.replace(/^\//, '') });
 

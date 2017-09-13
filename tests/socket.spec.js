@@ -34,8 +34,6 @@ describe('CoreIO.Socket', function() {
     let socket,
       sandbox,
       createServerStub,
-      getSocketServerStub,
-      socketServerStartStub,
       createSocketServerStub,
       socketServerOnStub,
       listenStub,
@@ -44,7 +42,6 @@ describe('CoreIO.Socket', function() {
     beforeEach(function() {
       sandbox = sinon.sandbox.create();
 
-      socketServerStartStub = sandbox.stub();
       socketServerOnStub = sandbox.stub();
       listenStub = sandbox.stub();
       installHandlersStub = sinon.stub();

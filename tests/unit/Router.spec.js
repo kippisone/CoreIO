@@ -1,3 +1,6 @@
+
+'use strict'
+
 const inspect = require('inspect.js')
 const sinon = require('sinon')
 const apiInspect = require('api-inspect')
@@ -8,7 +11,7 @@ const CoreIO = require('../../')
 const log = require('logtopus').getLogger('coreio')
 log.setLevel('error')
 
-describe.only('Router', () => {
+describe('Router', () => {
   describe('class', () => {
     it.skip('should be a class', () => {
       inspect(CoreIO.Router).isClass()
@@ -277,6 +280,14 @@ describe.only('Router', () => {
       router = new CoreIO.Router({
         noServer: true
       })
+
+      apiInspect.setApi(router.app)
+
+      router.resetRoutes()
+    })
+
+    afterEach(() => {
+      router.resetRoutes()
     })
 
     it('registers a model get route', () => {

@@ -101,7 +101,7 @@ describe('CoreIO.SyncModel', function() {
       unsetGroupStub = sandbox.stub();
       emitOneStub = sandbox.stub();
 
-      sandbox.stub(CoreIO.SyncModel.prototype, 'initSocket', function() {
+      sandbox.stub(CoreIO.SyncModel.prototype, 'initSocket').callsFake(function() {
         this.socket = {
           on: onStub,
           setGroup: setGroupStub,
@@ -140,7 +140,7 @@ describe('CoreIO.SyncModel', function() {
       unsetGroupStub = sandbox.stub();
       emitOneStub = sandbox.stub();
 
-      sandbox.stub(CoreIO.SyncModel.prototype, 'initSocket', function() {
+      sandbox.stub(CoreIO.SyncModel.prototype, 'initSocket').callsFake(function() {
         this.socket = {
           on: onStub,
           setGroup: setGroupStub,

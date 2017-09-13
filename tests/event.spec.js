@@ -322,12 +322,12 @@ describe('CoreIO.Event', function() {
     });
   });
 
-  describe('maxLength', function() {
+  describe('listenerMaxLength', function() {
     var ee;
 
     beforeEach(function() {
       ee = new CoreIO.Event();
-      ee.maxLength = 3;
+      ee.listenerMaxLength = 3;
     });
 
     it('Should warn if listener max length was exceeded', function() {
@@ -352,7 +352,7 @@ describe('CoreIO.Event', function() {
       CoreIO.eventListenerMaxLength = 5;
       ee = new CoreIO.Event();
 
-      inspect(ee.maxLength).isEql(5);
+      inspect(ee.listenerMaxLength).isEql(5);
     });
   });
 
@@ -364,7 +364,7 @@ describe('CoreIO.Event', function() {
 
     beforeEach(function() {
       ee = new CoreIO.Event();
-      ee.maxLength = 3;
+      ee.listenerMaxLength = 3;
 
       logStub = sinon.stub(ee.__logger, 'info');
       debugStub = sinon.stub(ee.__logger, 'debug');

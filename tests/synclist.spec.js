@@ -105,7 +105,7 @@ describe('CoreIO.SyncList', function() {
 
     beforeEach(function() {
       socketStub = sinon.createStubInstance(CoreIO.Socket);
-      initSocketStub = sinon.stub(CoreIO.SyncList.prototype, 'initSocket', function() {
+      initSocketStub = sinon.stub(CoreIO.SyncList.prototype, 'initSocket').callsFake(function() {
         this.socket = socketStub;
       });
     });
@@ -210,7 +210,7 @@ describe('CoreIO.SyncList', function() {
 
     beforeEach(function() {
       socketStub = sinon.createStubInstance(CoreIO.Socket);
-      initSocketStub = sinon.stub(CoreIO.SyncList.prototype, 'initSocket', function() {
+      initSocketStub = sinon.stub(CoreIO.SyncList.prototype, 'initSocket').callsFake(function() {
         this.socket = socketStub;
       });
     });
@@ -234,7 +234,7 @@ describe('CoreIO.SyncList', function() {
 
     beforeEach(function() {
       socketStub = sinon.createStubInstance(CoreIO.Socket);
-      initSocketStub = sinon.stub(CoreIO.SyncList.prototype, 'initSocket', function() {
+      initSocketStub = sinon.stub(CoreIO.SyncList.prototype, 'initSocket').callsFake(function() {
         this.socket = socketStub;
       });
     });

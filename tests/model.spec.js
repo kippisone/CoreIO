@@ -2491,20 +2491,21 @@ describe('CoreIO Model', function() {
       inspect(model.fetch()).isPromise();
     });
 
-    it('calls service.fetch with all args', function() {
-      let fetchStub = sinon.stub();
-      fetchStub.returns(Promise.resolve());
+    it('calls service.findOne with all args', function() {
+      let findOneStub = sinon.stub();
+      findOneStub.returns(Promise.resolve());
+
+      const FakeService = CoreIO.Service.inherit('fake');
+      FakeService.prototype.findOne = findOneStub;
 
       let model = new CoreIO.Model('test', {
-        service: {
-          fetch: fetchStub
-        }
+        service: FakeService
       });
 
-      let res = model.fetch('foo', 'bar');
+      model.fetch('foo', 'bar');
 
-      inspect(fetchStub).wasCalledOnce();
-      inspect(fetchStub).wasCalledWith('foo', 'bar');
+      inspect(findOneStub).wasCalledOnce();
+      inspect(findOneStub).wasCalledWith('foo', 'bar');
     });
 
     it('fetch sets model data', function() {
@@ -2513,13 +2514,14 @@ describe('CoreIO Model', function() {
         name: 'Test I'
       };
 
-      let fetchStub = sinon.stub();
-      fetchStub.returns(Promise.resolve(testData));
+      let findOneStub = sinon.stub();
+      findOneStub.returns(Promise.resolve(testData));
+
+      const FakeService = CoreIO.Service.inherit('fake');
+      FakeService.prototype.findOne = findOneStub;
 
       let model = new CoreIO.Model('test', {
-        service: {
-          fetch: fetchStub
-        }
+        service: FakeService
       });
 
       return model.fetch().then(() => {

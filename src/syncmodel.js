@@ -74,14 +74,16 @@ module.exports = function(CoreIO) {
   };
 
   SyncModel.prototype.initRest = function() {
-    CoreIO.api('/coreio/models/' + this.shortName).get((req, res) => {
-      if (req.accepts('json') === 'json') {
-        res.json(this.get());
-      } else if (req.accepts('html') === 'html') {
-        res.send(JSON.stringify(this.get(), null, '  '));
-      } else {
-        res.send(406);
-        log.warn('Accept header missing or invalid in request', req.path);
+    CoreIO.api('/coreio/models/' + this.shortName, {
+      get(req, res) {
+        if (req.accepts('json') === 'json') {
+          res.json(this.get());
+        } else if (req.accepts('html') === 'html') {
+          res.send(JSON.stringify(this.get(), null, '  '));
+        } else {
+          res.send(406);
+          log.warn('Accept header missing or invalid in request', req.path);
+        }
       }
     });
   };
