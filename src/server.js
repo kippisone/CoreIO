@@ -5,6 +5,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import firetpl from 'firetpl';
+import Superchain from 'superchain';
 
 
 export default function ServerFactory(CoreIO) {
@@ -37,11 +38,35 @@ export default function ServerFactory(CoreIO) {
       app.use(bodyParser.json());
       app.use(logtopus.express({
         logLevel: CoreIO.logLevel
-      }));
+      }))
 
       app.engine('.fire', firetpl.__express);
       app.set('views', path.join(__dirname, '../views'));
       app.set('view engine', 'fire');
+
+      const thisContext = {}
+      this.middlewareBucket = new Superchain()
+      this.routerBucket = new Superchain()
+      this.prepareBucket = new Superchain()
+      this.errorBucket = new Superchain()
+
+      app.use((req, res, next) => {
+        this.middlewareBucket
+          .runWith(thisContext, req, res).then(() => next())
+          .catch((err) => this.runErrorBucket(thisContext, err, req, res))
+      })
+
+      app.use((req, res, next) => {
+        this.routerBucket
+          .runWith(thisContext, req, res).then(() => next())
+          .catch((err) => this.runErrorBucket(thisContext, err, req, res))
+      })
+
+      app.use((req, res, next) => {
+        this.prepareBucket
+          .runWith(thisContext, req, res).then(() => next())
+          .catch((err) => this.runErrorBucket(thisContext, err, req, res))
+      })
 
       if (!options.noServer) {
         log.sys('Listen on port', CoreIO.httpPort);
@@ -57,12 +82,33 @@ export default function ServerFactory(CoreIO) {
       CoreIO.CoreEvents.emit('server:init', this);
     }
 
-    getCorsOoptions() {
+    /**
+     * Sets a middleware
+     *
+     * This method makes an express `app.use()` call with all given arguments
+     *
+     * @method use
+     *
+     * @param {any} middleware... Set one or more middlewares
+     *
+     * @chainable
+     * @returns {object} Returns this value
+     */
+    use() {
+      const args = Array.prototype.slice.call(arguments)
+      this.app.use.apply(this.app, args)
+    }
+
+    getCorsOoptions () {
 
     }
 
     registerStaticDir(dir) {
       this.app.use(express.static(dir));
+    }
+
+    runErrorBucket (thisContext, err, req, res) {
+      this.errorBucket.runWith(thisContext, err, req, res)
     }
   }
 

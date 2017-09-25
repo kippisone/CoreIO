@@ -19,12 +19,12 @@
     "api-inspect": "^0.1.0",
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.2.0",
-    "body-parser": "^1.17.0",
-    "express": "^4.15.4",
-    "inspect.js": "^1.6.1",
+    "body-parser": "^1.18.2",
+    "express": "^4.15.5",
+    "inspect.js": "^1.9.0",
     "lagoon-reporter": "^0.3.3",
     "mocha": "^3.5.0",
-    "sinon": "^3.2.1"
+    "sinon": "^3.3.0"
   },
   "dependencies": {
     "body-parser": "^1.15.2",
@@ -33,6 +33,7 @@
     "express": "^4.15.3",
     "firetpl": "^0.6.2",
     "logtopus": "^0.3.0",
-    "sockjs": "^0.3.17"
+    "sockjs": "^0.3.17",
+    "superchain": "^1.2.1"
   }
 }

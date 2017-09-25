@@ -82,13 +82,13 @@ describe('Router', () => {
         slug: '/foo'
       });
 
-      inspect(router).isObject();
+      inspect(router).isObject()
 
       return apiInspect.get('/foo').test((ctx) => {
-        ctx.statusCode(200);
-        ctx.contentType('application/json');
-        ctx.responseTime(50);
-      });
+        ctx.statusCode(200)
+        ctx.contentType('application/json')
+        ctx.responseTime(50)
+      })
     });
 
     it('registers a post route', () => {
@@ -412,5 +412,5 @@ describe('Router', () => {
         }]);
       });
     });
-  });
+  })
 })
