@@ -5,7 +5,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import firetpl from 'firetpl';
-import Superchain from 'superchain';
+import Bucketchain  from 'superchain/Bucketchain';
 
 
 export default function ServerFactory(CoreIO) {
@@ -44,28 +44,16 @@ export default function ServerFactory(CoreIO) {
       app.set('views', path.join(__dirname, '../views'));
       app.set('view engine', 'fire');
 
-      const thisContext = {}
-      this.middlewareBucket = new Superchain()
-      this.routerBucket = new Superchain()
-      this.prepareBucket = new Superchain()
-      this.errorBucket = new Superchain()
+      this.bucketChain = new Bucketchain()
+      this.bucketChain.bucket('middlewareBucket')
+      this.bucketChain.bucket('routerBucket')
+      this.bucketChain.bucket('prepareBucket')
+      this.bucketChain.errorBucket('errBucket')
 
       app.use((req, res, next) => {
-        this.middlewareBucket
-          .runWith(thisContext, req, res).then(() => next())
-          .catch((err) => this.runErrorBucket(thisContext, err, req, res))
-      })
-
-      app.use((req, res, next) => {
-        this.routerBucket
-          .runWith(thisContext, req, res).then(() => next())
-          .catch((err) => this.runErrorBucket(thisContext, err, req, res))
-      })
-
-      app.use((req, res, next) => {
-        this.prepareBucket
-          .runWith(thisContext, req, res).then(() => next())
-          .catch((err) => this.runErrorBucket(thisContext, err, req, res))
+        this.bucketChain
+          .run(req, res).then(() => next())
+          .catch((err) => next(err))
       })
 
       if (!options.noServer) {
@@ -94,9 +82,16 @@ export default function ServerFactory(CoreIO) {
      * @chainable
      * @returns {object} Returns this value
      */
-    use() {
+    use(path, fn) {
       const args = Array.prototype.slice.call(arguments)
-      this.app.use.apply(this.app, args)
+      // this.app.use.apply(this.app, args)
+      if (typeof path === 'string') {
+        const condition = (req, res) => {
+
+        }
+        
+        this.bucketChain.middlewareBucket.add(condition, fn)
+      }
     }
 
     getCorsOoptions () {
