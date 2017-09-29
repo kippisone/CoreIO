@@ -89,9 +89,25 @@ export default function ServerFactory(CoreIO) {
         const condition = (req, res) => {
 
         }
-        
+
         this.bucketChain.middlewareBucket.add(condition, fn)
       }
+    }
+
+    /**
+     * Registers a route
+     * @param  {string|regexp} route Route string
+     * @param  {function} ...funcs Callback or Async function which gets called when route got called
+     * @return {object}       Rerturns this value
+     */
+    route (method, route, ...funcs) {
+      const condition = (req, res) => {
+        if (req.method === method) {
+
+        }
+      }
+
+      this.routerBucket.add()
     }
 
     getCorsOoptions () {

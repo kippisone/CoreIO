@@ -49,6 +49,41 @@ describe('Server', () => {
     })
   })
 
+  describe('route()', () => {
+    let server
+    let useStub
+    let sandbox
+
+    beforeEach(() => {
+      server = new CoreIO.Server({
+        noServer: true
+      })
+
+      sandbox = sinon.sandbox.create()
+      useStub = sandbox.stub(server.app, 'use')
+    })
+
+    afterEach(() => {
+      sandbox.restore()
+    })
+
+    it('should add a route', () => {
+      const route = sinon.stub()
+      server.route(middleware)
+      inspect(useStub).wasCalledOnce()
+      inspect(useStub).wasCalledWith(middleware)
+    })
+
+    it('should add multiple middlewares', () => {
+      const middleware = sinon.stub()
+      const middleware2 = sinon.stub()
+      const middleware3 = sinon.stub()
+      server.use(middleware, middleware2, middleware3)
+      inspect(useStub).wasCalledOnce()
+      inspect(useStub).wasCalledWithExectly(middleware, middleware2, middleware3)
+    })
+  })
+
   describe.skip('setErrorHandler', () => {
     let server
 
