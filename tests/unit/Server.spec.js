@@ -197,39 +197,42 @@ describe('Server', () => {
     })
   })
 
-  describe('route()', () => {
+  describe.only('route()', () => {
     let server
-    let useStub
-    let sandbox
 
     beforeEach(() => {
       server = new CoreIO.Server({
         noServer: true
       })
-
-      sandbox = sinon.sandbox.create()
-      useStub = sandbox.stub(server.app, 'use')
-    })
-
-    afterEach(() => {
-      sandbox.restore()
     })
 
     it('should add a route', () => {
-      const route = sinon.stub()
-      server.route(middleware)
-      inspect(useStub).wasCalledOnce()
-      inspect(useStub).wasCalledWith(middleware)
+      const fn = sinon.spy((req, res, next, done) => { next() })
+      server.route('GET', '/foo/:name', fn)
+
+      return server.dispatch({
+        path: '/foo/bla',
+        method: 'GET'
+      }, {}).then(() => {
+        inspect(fn).wasCalledOnce()
+      })
     })
 
     it('should add multiple middlewares', () => {
-      const middleware = sinon.stub()
-      const middleware2 = sinon.stub()
-      const middleware3 = sinon.stub()
-      server.use(middleware, middleware2, middleware3)
-      inspect(useStub).wasCalledOnce()
-      inspect(useStub).wasCalledWithExectly(middleware, middleware2, middleware3)
+      const fn = sinon.spy((req, res, next, done) => { next() })
+      const fn2 = sinon.spy((req, res, next, done) => { next() })
+      const fn3 = sinon.spy((req, res, next, done) => { done() })
+      server.route('GET', '/foo/bla', fn, fn2, fn3)
+
+      return server.dispatch({
+        path: '/foo/bla',
+        method: 'GET'
+      }, {}).then(() => {
+        inspect(fn).wasCalledOnce()
+        inspect(fn2).wasCalledOnce()
+        inspect(fn3).wasCalledOnce()
+        inspect(fn).hasCallOrder(fn2, fn3)
+      })
     })
   })
-
 })

@@ -155,13 +155,19 @@ export default function ServerFactory(CoreIO) {
      * @return {object}       Rerturns this value
      */
     route (method, route, ...funcs) {
-      const condition = (req, res) => {
-        if (req.method === method) {
+      const keys = []
+      const reg = pathToRegexp(route, keys, {
+        sensitive: true
+      })
 
-        }
+      const condition = (req, res) => {
+        if (req.method !== method) return false
+        return reg.test(req.path)
       }
 
-      this.routerBucket.add()
+      for (let i = 0; i < funcs.length; i++) {
+        this.bucketChain.routerBucket.when(condition).add(funcs[i])
+      }
     }
 
     getCorsOoptions () {
