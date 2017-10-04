@@ -5,7 +5,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import firetpl from 'firetpl';
-import Bucketchain  from 'superchain/Bucketchain';
+import Bucketchain  from 'superchain/src/Bucketchain';
+import pathToRegexp from 'path-to-regexp'
 
 
 export default function ServerFactory(CoreIO) {
@@ -20,10 +21,10 @@ export default function ServerFactory(CoreIO) {
       const portNumber = `${this.port}`
 
       if (CoreIO.__registeredServers.has(portNumber)) {
-        this.app = CoreIO.__registeredServers.get(portNumber);
+        return CoreIO.__registeredServers.get(portNumber);
       } else {
         this.app = express();
-        CoreIO.__registeredServers.set(portNumber, this.app);
+        CoreIO.__registeredServers.set(portNumber, this);
 
         this.connect({
           noServer: conf.noServer
@@ -45,14 +46,14 @@ export default function ServerFactory(CoreIO) {
       app.set('view engine', 'fire');
 
       this.bucketChain = new Bucketchain()
-      this.bucketChain.bucket('middlewareBucket')
-      this.bucketChain.bucket('routerBucket')
       this.bucketChain.bucket('prepareBucket')
+      this.bucketChain.bucket('routerBucket')
+      this.bucketChain.bucket('presendBucket')
       this.bucketChain.errorBucket('errBucket')
 
       app.use((req, res, next) => {
-        this.bucketChain
-          .run(req, res).then(() => next())
+        this.dispatch(req, res)
+          .then(() => next())
           .catch((err) => next(err))
       })
 
@@ -71,26 +72,79 @@ export default function ServerFactory(CoreIO) {
     }
 
     /**
-     * Sets a middleware
+     * Dispatch a req, res pair into the middleware chain
      *
-     * This method makes an express `app.use()` call with all given arguments
+     * @method  dispatch
+     * @param   {object} req Request object
+     * @param   {object} res Response object
+     * @returns {void}
+     */
+    dispatch (req, res) {
+      return this.bucketChain.run(req, res)
+    }
+
+    /**
+     * Sets a middleware
      *
      * @method use
      *
-     * @param {any} middleware... Set one or more middlewares
+     * @param {any} ...middleware Set one or more middlewares
      *
      * @chainable
      * @returns {object} Returns this value
      */
-    use(path, fn) {
-      const args = Array.prototype.slice.call(arguments)
+    use(...args) {
       // this.app.use.apply(this.app, args)
-      if (typeof path === 'string') {
-        const condition = (req, res) => {
+      if (typeof args[0] === 'string') {
+        const keys = []
+        const reg = pathToRegexp(args[0], keys, {
+          sensitive: true,
+          end: false
+        })
 
+        const condition = (req, res) => {
+          return reg.test(req.path)
         }
-        
-        this.bucketChain.middlewareBucket.add(condition, fn)
+
+        for (let i = 1; i < args.length; i++) {
+          this.bucketChain.prepareBucket.when(condition).add(args[i])
+        }
+      } else {
+        for (let i = 0; i < args.length; i++) {
+          this.bucketChain.prepareBucket.add(args[i])
+        }
+      }
+    }
+
+    /**
+     * Sets a middleware after the routes chain
+     *
+     * @method useAfter
+     *
+     * @param {any} ...middleware Set one or more middlewares
+     *
+     * @chainable
+     * @returns {object} Returns this value
+     */
+    useAfter(...args) {
+      if (typeof args[0] === 'string') {
+        const keys = []
+        const reg = pathToRegexp(args[0], keys, {
+          sensitive: true,
+          end: false
+        })
+
+        const condition = (req, res) => {
+          return reg.test(req.path)
+        }
+
+        for (let i = 1; i < args.length; i++) {
+          this.bucketChain.presendBucket.when(condition).add(args[i])
+        }
+      } else {
+        for (let i = 0; i < args.length; i++) {
+          this.bucketChain.presendBucket.add(args[i])
+        }
       }
     }
 

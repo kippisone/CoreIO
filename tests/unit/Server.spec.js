@@ -16,74 +16,183 @@ describe('Server', () => {
 
   describe('use()', () => {
     let server
-    let useStub
-    let sandbox
 
     beforeEach(() => {
       server = new CoreIO.Server({
         noServer: true
       })
-
-      sandbox = sinon.sandbox.create()
-      useStub = sandbox.stub(server.app, 'use')
     })
 
-    afterEach(() => {
-      sandbox.restore()
+    it('register a middleware under a specific path', () => {
+      const fn = sinon.spy((req, res, next) => { next() })
+      const fn2 = sinon.spy((req, res, next) => { next() })
+
+      server.use(fn)
+      server.use(fn2)
+
+      return server.dispatch({
+        path: '/foo/bla'
+      }, {}).then(() => {
+        inspect(fn).wasCalledOnce()
+        inspect(fn2).wasCalledOnce()
+      })
     })
 
-    it('should add a middleware', () => {
-      const middleware = sinon.stub()
-      server.use(middleware)
-      inspect(useStub).wasCalledOnce()
-      inspect(useStub).wasCalledWith(middleware)
-    })
+    it('registers multiple middlewares under a specific path', () => {
+      const fn = sinon.spy((req, res, next) => { next() })
+      const fn2 = sinon.spy((req, res, next) => { next() })
+      const fn3 = sinon.spy((req, res, next) => { next() })
+      const fn4 = sinon.spy((req, res, next) => { next() })
 
-    it('should add multiple middlewares', () => {
-      const middleware = sinon.stub()
-      const middleware2 = sinon.stub()
-      const middleware3 = sinon.stub()
-      server.use(middleware, middleware2, middleware3)
-      inspect(useStub).wasCalledOnce()
-      inspect(useStub).wasCalledWithExectly(middleware, middleware2, middleware3)
+      server.use(fn, fn2, fn3, fn4)
+
+      return server.dispatch({
+        path: '/foo/bla'
+      }, {}).then(() => {
+        inspect(fn).wasCalledOnce()
+        inspect(fn2).wasCalledOnce()
+        inspect(fn3).wasCalledOnce()
+        inspect(fn4).wasCalledOnce()
+      })
     })
   })
 
-  describe.skip('setErrorHandler', () => {
+  describe('use([path], fn)', () => {
     let server
 
     beforeEach(() => {
       server = new CoreIO.Server({
         noServer: true
       })
-
-      apiInspect.setApi(server.app)
     })
 
-    it('should set a general error handler', () => {
-      const errHandler = sinon.spy(function(err, req, res, next) {
+    it('register a middleware under a specific path', () => {
+      const fn = sinon.spy((req, res, next) => { next() })
+      const fn2 = sinon.spy((req, res, next) => { next() })
 
+      server.use('/foo', fn)
+      server.use('/bar', fn)
+
+      return server.dispatch({
+        path: '/foo/bla'
+      }, {}).then(() => {
+        inspect(fn).wasCalledOnce()
+        inspect(fn2).wasNotCalled()
       })
-      server.setErrorHandler(errHandler)
-
-      inspect(server.__errorHandler).isEqual(errHandler)
     })
 
-    it('should call a general error handler', () => {
-      const errHandler = sinon.stub()
-      server.setErrorHandler(errHandler)
+    it('registers multiple middlewares under a specific path', () => {
+      const fn = sinon.spy((req, res, next) => { next() })
+      const fn2 = sinon.spy((req, res, next) => { next() })
+      const fn3 = sinon.spy((req, res, next) => { next() })
+      const fn4 = sinon.spy((req, res, next) => { next() })
 
-      inspect(server.__errorHandler).isEqual(errHandler)
+      server.use('/foo', fn, fn2, fn3, fn4)
 
-      server.use((req, res, next) => {
-        next("new Error('Test')")
+      return server.dispatch({
+        path: '/foo/bla'
+      }, {}).then(() => {
+        inspect(fn).wasCalledOnce()
+        inspect(fn2).wasCalledOnce()
+        inspect(fn3).wasCalledOnce()
+        inspect(fn4).wasCalledOnce()
       })
+    })
+  })
 
-      return apiInspect.get('/foo').test((ctx) => {
-        inspect(errHandler).wasCalledOnce()
-        ctx.statusCode(500)
-        ctx.contentType('application/json')
-        ctx.responseTime(50)
+  describe('useAfter()', () => {
+    let server
+
+    beforeEach(() => {
+      server = new CoreIO.Server({
+        noServer: true
+      })
+    })
+
+    it('register a middleware under a specific path', () => {
+      const fn = sinon.spy((req, res, next) => { next() })
+      const fn2 = sinon.spy((req, res, next) => { next() })
+      const fn3 = sinon.spy((req, res, next) => { next() })
+
+      server.use(fn)
+      server.useAfter(fn3)
+      server.use(fn2)
+
+      return server.dispatch({
+        path: '/foo/bla'
+      }, {}).then(() => {
+        inspect(fn).wasCalledOnce()
+        inspect(fn2).wasCalledOnce()
+        inspect(fn3).wasCalledOnce()
+        inspect(fn).hasCallOrder(fn2, fn3)
+      })
+    })
+
+    it('registers multiple middlewares under a specific path', () => {
+      const fn = sinon.spy((req, res, next) => { next() })
+      const fn2 = sinon.spy((req, res, next) => { next() })
+      const fn3 = sinon.spy((req, res, next) => { next() })
+      const fn4 = sinon.spy((req, res, next) => { next() })
+
+      server.useAfter(fn, fn2, fn3, fn4)
+
+      return server.dispatch({
+        path: '/foo/bla'
+      }, {}).then(() => {
+        inspect(fn).wasCalledOnce()
+        inspect(fn2).wasCalledOnce()
+        inspect(fn3).wasCalledOnce()
+        inspect(fn4).wasCalledOnce()
+      })
+    })
+  })
+
+  describe('useAfter([path], fn)', () => {
+    let server
+
+    beforeEach(() => {
+      server = new CoreIO.Server({
+        noServer: true
+      })
+    })
+
+    it('register a middleware under a specific path', () => {
+      const fn = sinon.spy((req, res, next) => { next() })
+      const fn2 = sinon.spy((req, res, next) => { next() })
+      const fn3 = sinon.spy((req, res, next) => { next() })
+
+      server.use('/foo', fn)
+      server.useAfter('/foo', fn3)
+      server.useAfter('/bar', fn3)
+      server.use('/bar', fn)
+      server.use('/bar', fn2)
+
+      return server.dispatch({
+        path: '/foo/bla'
+      }, {}).then(() => {
+        inspect(fn).wasCalledOnce()
+        inspect(fn2).wasNotCalled()
+        inspect(fn3).wasCalledOnce()
+        inspect(fn).hasCallOrder(fn3)
+      })
+    })
+
+    it('registers multiple middlewares under a specific path', () => {
+      const fn = sinon.spy((req, res, next) => { next() })
+      const fn2 = sinon.spy((req, res, next) => { next() })
+      const fn3 = sinon.spy((req, res, next) => { next() })
+      const fn4 = sinon.spy((req, res, next) => { next() })
+
+      server.use('/foo', fn, fn2, fn3, fn4)
+
+      return server.dispatch({
+        path: '/foo/bla'
+      }, {}).then(() => {
+        inspect(fn).wasCalledOnce()
+        inspect(fn2).wasCalledOnce()
+        inspect(fn3).wasCalledOnce()
+        inspect(fn4).wasCalledOnce()
+        inspect(fn).hasCallOrder(fn2, fn3, fn4)
       })
     })
   })
