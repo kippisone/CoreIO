@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha --reporter lagoon-reporter tests/*.spec.js tests/**/*.spec.js",
     "build": "babel src -d lib",
-    "dev": "babel src -d lib --watch"
+    "dev": "babel src -d lib --watch",
+    "prepublish": "npm run build"
   },
   "keywords": [
     "model",
