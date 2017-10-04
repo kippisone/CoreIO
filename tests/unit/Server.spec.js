@@ -197,7 +197,7 @@ describe('Server', () => {
     })
   })
 
-  describe.only('route()', () => {
+  describe('route()', () => {
     let server
 
     beforeEach(() => {
