@@ -1,7 +1,6 @@
 'use strict'
 
 const inspect = require('inspect.js')
-const apiInspect = require('api-inspect')
 const sinon = require('sinon')
 inspect.useSinon(sinon)
 
@@ -206,8 +205,28 @@ describe('Server', () => {
       })
     })
 
+    afterEach(() => {
+      server.removeAllRoutes(true)
+    })
+
+    it('should register a route in an internal storage', () => {
+      server.route('GET', '/foo/:name', (req, res, next, done) => { done() })
+
+      inspect(server.__routes).isObject()
+      inspect(server.__routes.size).isEql(1)
+      inspect(server.__routes.get('GET /foo/:name')).hasProps({
+        method: 'GET',
+        route: '/foo/:name',
+        keys: [{
+          name: 'name',
+          offset: 6,
+          optional: false
+        }]
+      })
+    })
+
     it('should add a route', () => {
-      const fn = sinon.spy((req, res, next, done) => { next() })
+      const fn = sinon.spy((req, res, next) => { next() })
       server.route('GET', '/foo/:name', fn)
 
       return server.dispatch({

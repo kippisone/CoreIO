@@ -1,13 +1,14 @@
-import path from 'path';
+import path from 'path'
 
-import logtopus from 'logtopus';
-import express from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import firetpl from 'firetpl';
-import Bucketchain  from 'superchain/src/Bucketchain';
+import logtopus from 'logtopus'
+import express from 'express'
+import bodyParser from 'body-parser'
+import cors from 'cors'
+import firetpl from 'firetpl'
+import Bucketchain  from 'superchain/src/Bucketchain'
 import pathToRegexp from 'path-to-regexp'
 
+import Route from './utils/Route'
 
 export default function ServerFactory(CoreIO) {
   let log = require('logtopus').getLogger('coreio');
@@ -21,29 +22,31 @@ export default function ServerFactory(CoreIO) {
       const portNumber = `${this.port}`
 
       if (CoreIO.__registeredServers.has(portNumber)) {
-        return CoreIO.__registeredServers.get(portNumber);
+        return CoreIO.__registeredServers.get(portNumber)
       } else {
         this.app = express();
-        CoreIO.__registeredServers.set(portNumber, this);
+        CoreIO.__registeredServers.set(portNumber, this)
 
         this.connect({
           noServer: conf.noServer
         });
+
+        this.__routes = new Map()
       }
     }
 
     connect(options) {
-      options = options || {};
-      const app = this.app;
-      app.use(cors(this.getCorsOoptions()));
-      app.use(bodyParser.json());
+      options = options || {}
+      const app = this.app
+      app.use(cors(this.getCorsOoptions()))
+      app.use(bodyParser.json())
       app.use(logtopus.express({
         logLevel: CoreIO.logLevel
       }))
 
-      app.engine('.fire', firetpl.__express);
-      app.set('views', path.join(__dirname, '../views'));
-      app.set('view engine', 'fire');
+      app.engine('.fire', firetpl.__express)
+      app.set('views', path.join(__dirname, '../views'))
+      app.set('view engine', 'fire')
 
       this.bucketChain = new Bucketchain()
       this.bucketChain.bucket('prepareBucket')
@@ -58,8 +61,8 @@ export default function ServerFactory(CoreIO) {
       })
 
       if (!options.noServer) {
-        log.sys('Listen on port', CoreIO.httpPort);
-        app.listen(CoreIO.httpPort, CoreIO.httpHost);
+        log.sys('Listen on port', CoreIO.httpPort)
+        app.listen(CoreIO.httpPort, CoreIO.httpHost)
       }
 
       /**
@@ -81,6 +84,11 @@ export default function ServerFactory(CoreIO) {
      */
     dispatch (req, res) {
       return this.bucketChain.run(req, res)
+    }
+
+    removeAllRoutes (removeMiddlewares) {
+      if (removeMiddlewares === true) this.bucketChain.clear()
+      this.bucketChain.clear('routerBucket')
     }
 
     /**
@@ -155,18 +163,14 @@ export default function ServerFactory(CoreIO) {
      * @return {object}       Rerturns this value
      */
     route (method, route, ...funcs) {
-      const keys = []
-      const reg = pathToRegexp(route, keys, {
-        sensitive: true
-      })
-
-      const condition = (req, res) => {
-        if (req.method !== method) return false
-        return reg.test(req.path)
+      if (!this.__routes.has(`${method} ${route}`)) {
+        const routeItem = new Route(method, route)
+        this.__routes.set(`${method} ${route}`, routeItem)
       }
 
+      const routeObj = this.__routes.get(`${method} ${route}`)
       for (let i = 0; i < funcs.length; i++) {
-        this.bucketChain.routerBucket.when(condition).add(funcs[i])
+        this.bucketChain.routerBucket.when(routeObj.condition).add(funcs[i])
       }
     }
 
