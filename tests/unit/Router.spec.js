@@ -40,6 +40,10 @@ describe('Router', () => {
       apiInspect.setApi(router.app)
     })
 
+    afterEach(() => {
+      router.removeAllRoutes(true)
+    })
+
     it('registers a get route', () => {
       const getStub = sinon.stub();
       getStub.returns(Promise.resolve({ foo: 'bar' }));

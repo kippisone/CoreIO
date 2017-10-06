@@ -39,7 +39,7 @@ export default function Router(CoreIO) {
     }
 
     registerRoutes(conf) {
-      conf.allow = conf.allow || ['READ'];
+      conf.allow = conf.allow || ['READ']
 
       if (conf.model || conf.list) {
         conf = this.createConfig(conf);
@@ -52,7 +52,7 @@ export default function Router(CoreIO) {
           for (const method of HTTP_METHODS) {
             if (c[method]) {
               log.sys(`Register route ${method.toUpperCase()} ${c.slug}`);
-              this.server.route(method, c.slug, this.requestHandler(c[method]))
+              this.server.route(method.toUpperCase(), c.slug, this.requestHandler(c[method]))
             }
           }
         }
@@ -76,11 +76,10 @@ export default function Router(CoreIO) {
         if (conf.allow.indexOf('READ') !== -1) {
           newConf.push({
             slug: conf.slug.replace(/\/$/, '') + '/:id',
-            get(req, res, next) {
+            async get (req, res) {
               const model = new Model();
-              return model.fetch(req.params.id).then(() => {
-                return model.get();
-              });
+              await model.fetch(req.params.id)
+              return model.get()
             }
           });
         }
@@ -88,7 +87,7 @@ export default function Router(CoreIO) {
         if (conf.allow.indexOf('CREATE') !== -1) {
           newConf.push({
             slug: conf.slug.replace(/\/$/, ''),
-            post(req, res, next) {
+            async post(req, res) {
               const model = new Model();
               model.set(req.body);
               return model.save();
@@ -99,7 +98,7 @@ export default function Router(CoreIO) {
         if (conf.allow.indexOf('UPDATE') !== -1) {
           newConf.push({
             slug: conf.slug.replace(/\/$/, '') + '/:id',
-            put(req, res, next) {
+            async put(req, res) {
               const model = new Model();
               const id = model.get('id');
               model.replace(req.body)
@@ -110,7 +109,7 @@ export default function Router(CoreIO) {
 
           newConf.push({
             slug: conf.slug.replace(/\/$/, '') + '/:id',
-            patch(req, res, next) {
+            async patch(req, res) {
               const model = new Model();
               model.set(req.body);
               return model.save();
@@ -121,7 +120,7 @@ export default function Router(CoreIO) {
         if (conf.allow.indexOf('DELETE') !== -1) {
           newConf.push({
             slug: conf.slug.replace(/\/$/, '') + '/:id',
-            delete(req, res, next) {
+            delete(req, res) {
               const model = new Model();
               return model.delete(req.params.id);
             }
@@ -134,11 +133,10 @@ export default function Router(CoreIO) {
         if (conf.allow.indexOf('READ') !== -1) {
           newConf.push({
             slug: conf.slug.replace(/\/$/, ''),
-            get(req, res, next) {
+            async get(req, res) {
               const list = new List();
-              return list.fetch().then(() => {
-                return list.toArray();
-              });
+              await list.fetch()
+              return list.toArray();
             }
           });
         }
@@ -148,8 +146,10 @@ export default function Router(CoreIO) {
     }
 
     requestHandler(fn) {
-      return (req, res, next) => {
-        const p = typeof fn === 'object' ? fn : fn(req, res, next);
+      return async function (...args) {
+        const req = args[0]
+        const res = args[1]
+        const p = typeof fn === 'object' ? fn : fn.apply(null, args)
         if (!p) {
           if (p === '') {
             res.type('text/plain')
@@ -161,13 +161,13 @@ export default function Router(CoreIO) {
         }
 
         if (typeof p.then === 'function' && typeof p.catch === 'function') {
-          p.then((data) => {
-            res.status(200);
-            typeof data === 'object' && req.accepts('json') ? res.json(data) : data;
-          }).catch((err) => {
-            res.status(err.statusCode || 500);
-            res.send(err.message);
-          });
+          const data = await p
+          res.status(200);
+          typeof data === 'object' && req.accepts('json') ? res.json(data) : data;
+          // }).catch((err) => {
+          //   res.status(err.statusCode || 500);
+          //   res.send(err.message);
+          // });
         } else {
           res.status(200)
           typeof p === 'object' && req.accepts('json') ? res.json(p) : p;
@@ -189,6 +189,14 @@ export default function Router(CoreIO) {
           i += 1
         }
       }
+    }
+
+    removeAllRoutes (removeMiddlewares) {
+      this.server.removeAllRoutes(removeMiddlewares)
+    }
+
+    getAllRoutes (returnMiddlewares) {
+      return this.server.getAllRoutes(returnMiddlewares)
     }
 
     resetRoutes() {

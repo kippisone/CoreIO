@@ -173,8 +173,6 @@ export default function ServerFactory(CoreIO) {
       for (let i = 0; i < funcs.length; i++) {
         this.bucketChain.routerBucket.when(routeObj.condition).add(funcs[i])
       }
-
-      console.log('R', this.bucketChain)
     }
 
     getCorsOoptions () {
@@ -187,6 +185,15 @@ export default function ServerFactory(CoreIO) {
 
     runErrorBucket (thisContext, err, req, res) {
       this.errorBucket.runWith(thisContext, err, req, res)
+    }
+
+    getAllRoutes (returnMiddlewares) {
+      const routes = []
+      this.__routes.forEach((value, key) => {
+        routes.push(value)
+      })
+
+      return routes
     }
   }
 

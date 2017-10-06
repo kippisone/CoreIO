@@ -14,7 +14,6 @@ export default class Route {
 
   getConditionFunc () {
     return (req, res) => {
-      console.log('OK', req.method, req.path)
       if (req.method !== this.method) return false
       return this.reg.test(req.path)
     }
