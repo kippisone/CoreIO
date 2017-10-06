@@ -89,6 +89,7 @@ export default function ServerFactory(CoreIO) {
     removeAllRoutes (removeMiddlewares) {
       if (removeMiddlewares === true) this.bucketChain.clear()
       this.bucketChain.clear('routerBucket')
+      this.__routes.clear()
     }
 
     /**
@@ -172,6 +173,8 @@ export default function ServerFactory(CoreIO) {
       for (let i = 0; i < funcs.length; i++) {
         this.bucketChain.routerBucket.when(routeObj.condition).add(funcs[i])
       }
+
+      console.log('R', this.bucketChain)
     }
 
     getCorsOoptions () {

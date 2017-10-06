@@ -15,8 +15,6 @@
 
 'use strict';
 
-import express from 'express';
-
 const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete'];
 
 export default function Router(CoreIO) {
@@ -35,11 +33,6 @@ export default function Router(CoreIO) {
       this.server = server;
       this.app = server.app;
 
-      if (conf.mount) {
-        this.Router = express.Router()
-        this.app.use(conf.mount, this.Router)
-      }
-
       if (conf.slug) {
         this.registerRoutes(conf);
       }
@@ -56,11 +49,10 @@ export default function Router(CoreIO) {
 
       for (const c of conf) {
         if (c.slug) {
-          const r = this.route(c.slug);
           for (const method of HTTP_METHODS) {
             if (c[method]) {
               log.sys(`Register route ${method.toUpperCase()} ${c.slug}`);
-              r[method](this.requestHandler(c[method]));
+              this.server.route(method, c.slug, this.requestHandler(c[method]))
             }
           }
         }
@@ -181,14 +173,6 @@ export default function Router(CoreIO) {
           typeof p === 'object' && req.accepts('json') ? res.json(p) : p;
         }
       };
-    }
-
-    route(slug) {
-      if (this.Router) {
-        return this.Router.route(slug)
-      }
-
-      return this.app.route(slug)
     }
 
     removeRoute(path) {

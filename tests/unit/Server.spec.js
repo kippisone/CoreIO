@@ -7,12 +7,6 @@ inspect.useSinon(sinon)
 const CoreIO = require('../../')
 
 describe('Server', () => {
-  describe('instance', () => {
-    it('', () => {
-
-    })
-  })
-
   describe('use()', () => {
     let server
 
@@ -20,6 +14,10 @@ describe('Server', () => {
       server = new CoreIO.Server({
         noServer: true
       })
+    })
+
+    afterEach(() => {
+      server.removeAllRoutes(true)
     })
 
     it('register a middleware under a specific path', () => {
@@ -65,6 +63,10 @@ describe('Server', () => {
       })
     })
 
+    afterEach(() => {
+      server.removeAllRoutes(true)
+    })
+
     it('register a middleware under a specific path', () => {
       const fn = sinon.spy((req, res, next) => { next() })
       const fn2 = sinon.spy((req, res, next) => { next() })
@@ -106,6 +108,10 @@ describe('Server', () => {
       server = new CoreIO.Server({
         noServer: true
       })
+    })
+
+    afterEach(() => {
+      server.removeAllRoutes(true)
     })
 
     it('register a middleware under a specific path', () => {
@@ -153,6 +159,10 @@ describe('Server', () => {
       server = new CoreIO.Server({
         noServer: true
       })
+    })
+
+    afterEach(() => {
+      server.removeAllRoutes(true)
     })
 
     it('register a middleware under a specific path', () => {

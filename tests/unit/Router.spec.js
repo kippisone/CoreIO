@@ -27,40 +27,6 @@ describe('Router', () => {
       inspect(router).isInstanceOf(CoreIO.Router)
       inspect(router).hasKeys(['app', 'server'])
     })
-
-    it('uses a sub router', () => {
-      const router = new CoreIO.Router({
-        noServer: true,
-        mount: '/foo'
-      })
-
-      inspect(router).hasKey('Router')
-    })
-  })
-
-  describe('route()', () => {
-    it('registers a route', () => {
-      const router = new CoreIO.Router({
-        noServer: true
-      })
-
-      const r = router.route('/bar')
-      inspect(r).isObject()
-      inspect(r).hasMethod('get')
-      inspect(r).hasMethod('post')
-    })
-
-    it('registers a route with mount path', () => {
-      const router = new CoreIO.Router({
-        noServer: true,
-        mount: '/foo'
-      })
-
-      const r = router.route('/bar')
-      inspect(r).isObject()
-      inspect(r).hasMethod('get')
-      inspect(r).hasMethod('post')
-    })
   })
 
   describe('registerRoutes', () => {
