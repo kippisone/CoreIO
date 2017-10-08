@@ -33,6 +33,10 @@ export default function Router(CoreIO) {
       this.server = server;
       this.app = server.app;
 
+      if (conf.reset) {
+        this.removeAllRoutes(true)
+      }
+
       if (conf.slug) {
         this.registerRoutes(conf);
       }
@@ -161,9 +165,7 @@ export default function Router(CoreIO) {
         }
 
         if (typeof p.then === 'function' && typeof p.catch === 'function') {
-          console.log('##1')
           const data = await p
-          console.log('##1A')
           res.status(200);
           typeof data === 'object' && req.accepts('json') ? res.json(data) : res.send(data);
         } else {

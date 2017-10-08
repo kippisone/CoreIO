@@ -154,33 +154,26 @@ describe('Router', () => {
       apiInspect.setApi(router.app)
     })
 
-    afterEach(() => {
-      router.removeAllRoutes(true)
-    })
-
     it('handles errors thrown in a get route', () => {
       const getStub = sinon.stub();
       const errStub = sinon.stub();
       getStub.throws(new Error('Beer is empty!'));
       errStub.returns({ err: 'beer-empty' });
       router.registerRoutes({
-        async get (req, res, next) {
+        get (req, res, next) {
           throw new Error('Oh shit')
-          return 'Supi'
         },
         slug: '/foo'
       })
 
-      router.errorHandler(function errHandler (err, req, res, next) {
-        console.log('ERRALL')
+      router.errorHandler(function errHandler (err, req, res, next, finish) {
         res.status(501)
         res.send({})
-        next()
+        finish()
       })
 
       inspect(router).isObject()
 
-      console.log(router.server.bucketChain.errBucket)
       return apiInspect.get('/foo').test((ctx) => {
         ctx.statusCode(501)
         ctx.contentType('application/json')

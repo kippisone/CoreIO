@@ -58,8 +58,8 @@ export default function ServerFactory(CoreIO) {
 
       app.use((req, res, next) => {
         this.dispatch(req, res)
-          .then(() => res.end())
-          .catch((err) => console.log('OKIDOKI'))
+          .then(() => {})
+          .catch((err) => next(err))
       })
 
       if (!options.noServer) {
@@ -77,7 +77,7 @@ export default function ServerFactory(CoreIO) {
     }
 
     setDefaultRoutes () {
-      this.bucketChain.errBucket.final((err, req, res, next) => {
+      this.bucketChain.errBucket.final(function finalErrorHandler (err, req, res, next) {
         // call final err
         res.status(500)
         res.send(err)
@@ -100,7 +100,7 @@ export default function ServerFactory(CoreIO) {
     removeAllRoutes (removeMiddlewares) {
       if (removeMiddlewares === true){
         this.bucketChain.clear()
-        // this.setDefaultRoutes()
+        this.setDefaultRoutes()
       } else {
         this.bucketChain.clear('routerBucket')
       }
