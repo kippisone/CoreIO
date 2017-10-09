@@ -264,4 +264,50 @@ describe('Server', () => {
       })
     })
   })
+
+  describe('errorHandler', () => {
+    let server
+
+    beforeEach(() => {
+      server = new CoreIO.Server({
+        noServer: true
+      })
+    })
+
+    afterEach(() => {
+      server.removeAllRoutes(true)
+    })
+
+    it('calls an error handler', () => {
+      const fn = sinon.spy((req, res, next) => { throw new Error('Fucking error!') })
+      const fn2 = sinon.spy((err, req, res, next) => { next() })
+      server.use(fn)
+      server.errorHandler(fn2)
+
+      return server.dispatch({
+        path: '/foo/bla',
+        method: 'GET'
+      }, {
+        status() {},
+        send() {}
+      }).then(() => {
+        inspect(fn2).wasCalledOnce()
+      })
+    })
+
+    it('never calls an error handler if no error was thrown', () => {
+      const fn = sinon.spy((req, res, next) => { next() })
+      const fn2 = sinon.spy((err, req, res, next) => { next() })
+      server.use(fn)
+      server.errorHandler(fn2)
+
+      return server.dispatch({
+        path: '/foo/bla',
+        method: 'GET'
+      }, {}).then(() => {
+        inspect(fn).wasCalledOnce()
+        inspect(fn2).wasNotCalled()
+      })
+    })
+  })
 })

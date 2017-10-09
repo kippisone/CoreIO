@@ -161,16 +161,14 @@ export default function Router(CoreIO) {
         }
 
         if (typeof p.then === 'function' && typeof p.catch === 'function') {
+          console.log('##1')
           const data = await p
+          console.log('##1A')
           res.status(200);
-          typeof data === 'object' && req.accepts('json') ? res.json(data) : data;
-          // }).catch((err) => {
-          //   res.status(err.statusCode || 500);
-          //   res.send(err.message);
-          // });
+          typeof data === 'object' && req.accepts('json') ? res.json(data) : res.send(data);
         } else {
           res.status(200)
-          typeof p === 'object' && req.accepts('json') ? res.json(p) : p;
+          typeof p === 'object' && req.accepts('json') ? res.json(p) : ses.send(p);
         }
       };
     }
@@ -213,6 +211,10 @@ export default function Router(CoreIO) {
           i += 1
         }
       }
+    }
+
+    errorHandler (fn) {
+      this.server.errorHandler(fn)
     }
   }
 

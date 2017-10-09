@@ -54,10 +54,12 @@ export default function ServerFactory(CoreIO) {
       this.bucketChain.bucket('presendBucket')
       this.bucketChain.errorBucket('errBucket')
 
+      this.setDefaultRoutes()
+
       app.use((req, res, next) => {
         this.dispatch(req, res)
-          .then(() => next())
-          .catch((err) => next(err))
+          .then(() => res.end())
+          .catch((err) => console.log('OKIDOKI'))
       })
 
       if (!options.noServer) {
@@ -74,21 +76,35 @@ export default function ServerFactory(CoreIO) {
       CoreIO.CoreEvents.emit('server:init', this);
     }
 
+    setDefaultRoutes () {
+      this.bucketChain.errBucket.final((err, req, res, next) => {
+        // call final err
+        res.status(500)
+        res.send(err)
+        next()
+      })
+    }
+
     /**
      * Dispatch a req, res pair into the middleware chain
      *
      * @method  dispatch
      * @param   {object} req Request object
      * @param   {object} res Response object
-     * @returns {void}
+     * @returns {object} Returns a Promise
      */
     dispatch (req, res) {
       return this.bucketChain.run(req, res)
     }
 
     removeAllRoutes (removeMiddlewares) {
-      if (removeMiddlewares === true) this.bucketChain.clear()
-      this.bucketChain.clear('routerBucket')
+      if (removeMiddlewares === true){
+        this.bucketChain.clear()
+        // this.setDefaultRoutes()
+      } else {
+        this.bucketChain.clear('routerBucket')
+      }
+
       this.__routes.clear()
     }
 
@@ -175,6 +191,10 @@ export default function ServerFactory(CoreIO) {
       }
     }
 
+    errorHandler (fn) {
+      this.bucketChain.errBucket.add(fn)
+    }
+
     getCorsOoptions () {
 
     }
@@ -184,7 +204,7 @@ export default function ServerFactory(CoreIO) {
     }
 
     runErrorBucket (thisContext, err, req, res) {
-      this.errorBucket.runWith(thisContext, err, req, res)
+      this.errBucket.runWith(thisContext, err, req, res)
     }
 
     getAllRoutes (returnMiddlewares) {

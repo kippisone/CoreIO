@@ -50,7 +50,7 @@ describe('Router', () => {
       router.registerRoutes({
         get: getStub,
         slug: '/foo'
-      });
+      })
 
       inspect(router).isObject()
 
@@ -59,7 +59,7 @@ describe('Router', () => {
         ctx.contentType('application/json')
         ctx.responseTime(50)
       })
-    });
+    })
 
     it('registers a post route', () => {
       const postStub = sinon.stub();
@@ -67,19 +67,19 @@ describe('Router', () => {
       router.registerRoutes({
         post: postStub,
         slug: '/foo'
-      });
+      })
 
       inspect(router).isObject();
 
       return apiInspect.post('/foo', { bla: 'blubb' }).test((ctx) => {
-        ctx.statusCode(200);
-        ctx.contentType('application/json');
-        ctx.responseTime(50);
+        ctx.statusCode(200)
+        ctx.contentType('application/json')
+        ctx.responseTime(50)
 
-        inspect(ctx.data).isEql({ bla: 'blubb' });
-        inspect(ctx.body).isEql({ foo: 'bar' });
-      });
-    });
+        inspect(ctx.data).isEql({ bla: 'blubb' })
+        inspect(ctx.body).isEql({ foo: 'bar' })
+      })
+    })
 
     it('registers a put route', () => {
       const putStub = sinon.stub();
@@ -140,6 +140,53 @@ describe('Router', () => {
         inspect(ctx.body).isEql({ id: 1328 });
       });
     });
+  })
+
+  describe('errorHandler', () => {
+    let router;
+
+    beforeEach(() => {
+      router = new CoreIO.Router({
+        noServer: true,
+        reset: true
+      })
+
+      apiInspect.setApi(router.app)
+    })
+
+    afterEach(() => {
+      router.removeAllRoutes(true)
+    })
+
+    it('handles errors thrown in a get route', () => {
+      const getStub = sinon.stub();
+      const errStub = sinon.stub();
+      getStub.throws(new Error('Beer is empty!'));
+      errStub.returns({ err: 'beer-empty' });
+      router.registerRoutes({
+        async get (req, res, next) {
+          throw new Error('Oh shit')
+          return 'Supi'
+        },
+        slug: '/foo'
+      })
+
+      router.errorHandler(function errHandler (err, req, res, next) {
+        console.log('ERRALL')
+        res.status(501)
+        res.send({})
+        next()
+      })
+
+      inspect(router).isObject()
+
+      console.log(router.server.bucketChain.errBucket)
+      return apiInspect.get('/foo').test((ctx) => {
+        ctx.statusCode(501)
+        ctx.contentType('application/json')
+        ctx.responseTime(50)
+      })
+    })
   })
 
   describe('createConfig', () => {
@@ -252,12 +299,10 @@ describe('Router', () => {
       })
 
       apiInspect.setApi(router.app)
-
-      router.resetRoutes()
     })
 
     afterEach(() => {
-      router.resetRoutes()
+      router.removeAllRoutes(true)
     })
 
     it('registers a model get route', () => {
