@@ -172,7 +172,7 @@ export default function Router(CoreIO) {
           res.status(200)
           typeof p === 'object' && req.accepts('json') ? res.json(p) : res.send(p);
         }
-      };
+      }
     }
 
     removeRoute(path) {

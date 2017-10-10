@@ -57,7 +57,7 @@ describe('Router', () => {
       return apiInspect.get('/foo').test((ctx) => {
         ctx.statusCode(200)
         ctx.contentType('application/json')
-        ctx.responseTime(50)
+        ctx.responseTime(150)
       })
     })
 
@@ -74,7 +74,7 @@ describe('Router', () => {
       return apiInspect.post('/foo', { bla: 'blubb' }).test((ctx) => {
         ctx.statusCode(200)
         ctx.contentType('application/json')
-        ctx.responseTime(50)
+        ctx.responseTime(150)
 
         inspect(ctx.data).isEql({ bla: 'blubb' })
         inspect(ctx.body).isEql({ foo: 'bar' })
@@ -94,7 +94,7 @@ describe('Router', () => {
       return apiInspect.put('/foo', { bla: 'blubb' }).test((ctx) => {
         ctx.statusCode(200);
         ctx.contentType('application/json');
-        ctx.responseTime(50);
+        ctx.responseTime(150);
 
         inspect(ctx.data).isEql({ bla: 'blubb' });
         inspect(ctx.body).isEql({ foo: 'bar' });
@@ -114,7 +114,7 @@ describe('Router', () => {
       return apiInspect.patch('/foo', { bla: 'blubb' }).test((ctx) => {
         ctx.statusCode(200);
         ctx.contentType('application/json');
-        ctx.responseTime(50);
+        ctx.responseTime(150);
 
         inspect(ctx.data).isEql({ bla: 'blubb' });
         inspect(ctx.body).isEql({ id: 1328 });
@@ -134,7 +134,7 @@ describe('Router', () => {
       return apiInspect.delete('/foo', { bla: 'blubb' }).test((ctx) => {
         ctx.statusCode(200);
         ctx.contentType('application/json');
-        ctx.responseTime(50);
+        ctx.responseTime(150);
 
         inspect(ctx.query).isEql({ bla: 'blubb' });
         inspect(ctx.body).isEql({ id: 1328 });
@@ -177,7 +177,7 @@ describe('Router', () => {
       return apiInspect.get('/foo').test((ctx) => {
         ctx.statusCode(501)
         ctx.contentType('application/json')
-        ctx.responseTime(50)
+        ctx.responseTime(150)
       })
     })
 
@@ -204,7 +204,7 @@ describe('Router', () => {
       return apiInspect.post('/foo').test((ctx) => {
         ctx.statusCode(501)
         ctx.contentType('application/json')
-        ctx.responseTime(50)
+        ctx.responseTime(150)
       })
     })
 
@@ -231,7 +231,7 @@ describe('Router', () => {
       return apiInspect.put('/foo').test((ctx) => {
         ctx.statusCode(501)
         ctx.contentType('application/json')
-        ctx.responseTime(50)
+        ctx.responseTime(150)
       })
     })
 
@@ -258,7 +258,7 @@ describe('Router', () => {
       return apiInspect.delete('/foo').test((ctx) => {
         ctx.statusCode(501)
         ctx.contentType('application/json')
-        ctx.responseTime(50)
+        ctx.responseTime(150)
       })
     })
   })
@@ -390,7 +390,7 @@ describe('Router', () => {
       return apiInspect.get('/test/1328').test((ctx) => {
         ctx.statusCode(200)
         ctx.contentType('application/json')
-        ctx.responseTime(50)
+        ctx.responseTime(150)
         inspect(ctx.body).isEql({
           id: 1328,
           foo: 'bar'
@@ -410,7 +410,7 @@ describe('Router', () => {
       return apiInspect.post('/test', { bla: 'blubb' }).test((ctx) => {
         ctx.statusCode(200);
         ctx.contentType('application/json');
-        ctx.responseTime(50);
+        ctx.responseTime(150);
         inspect(ctx.body).isEql({
           id: 1328
         });
@@ -433,7 +433,7 @@ describe('Router', () => {
       return apiInspect.put('/test/1328', { bla: 'blubb' }).test((ctx) => {
         ctx.statusCode(200);
         ctx.contentType('application/json');
-        ctx.responseTime(50);
+        ctx.responseTime(150);
 
         inspect(ctx.data).isEql({ bla: 'blubb' });
         inspect(ctx.body).isEql({ id: 1328 });
@@ -452,7 +452,7 @@ describe('Router', () => {
       return apiInspect.patch('/test/1328', { bla: 'blubb' }).test((ctx) => {
         ctx.statusCode(200);
         ctx.contentType('application/json');
-        ctx.responseTime(50);
+        ctx.responseTime(150);
 
         inspect(ctx.data).isEql({ bla: 'blubb' });
         inspect(ctx.body).isEql({ id: 1328 });
@@ -471,7 +471,7 @@ describe('Router', () => {
       return apiInspect.delete('/test/1328').test((ctx) => {
         ctx.statusCode(200);
         ctx.contentType('application/json');
-        ctx.responseTime(50);
+        ctx.responseTime(150);
 
         inspect(ctx.body).isEql({ id: 1328 });
       });
@@ -488,7 +488,7 @@ describe('Router', () => {
       return apiInspect.get('/test').test((ctx) => {
         ctx.statusCode(200);
         ctx.contentType('application/json');
-        ctx.responseTime(50);
+        ctx.responseTime(150);
         inspect(ctx.body).isEql([{
           id: 1328,
           foo: 'bar'

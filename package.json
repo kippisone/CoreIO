@@ -34,6 +34,6 @@
     "logtopus": "^0.3.0",
     "path-to-regexp": "^2.0.0",
     "sockjs": "^0.3.17",
-    "superchain": "^2.0.1"
+    "superchain": "^2.0.2"
   }
 }
