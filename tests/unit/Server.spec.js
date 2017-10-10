@@ -6,6 +6,9 @@ inspect.useSinon(sinon)
 
 const CoreIO = require('../../')
 
+const BadGateway = require('../../src/errors/BadGateway')
+const InternalServerError = require('../../src/errors/InternalServerError')
+
 describe('Server', () => {
   describe('use()', () => {
     let server
@@ -307,6 +310,47 @@ describe('Server', () => {
       }, {}).then(() => {
         inspect(fn).wasCalledOnce()
         inspect(fn2).wasNotCalled()
+      })
+    })
+
+    const arr = [
+      { ErrorClass: InternalServerError, status: 500, message: 'Beer is empty!', error: 'InternalServerError' },
+      { ErrorClass: BadGateway, status: 502, message: 'Beer is empty!', error: 'BadGateway' }
+    ]
+
+    arr.forEach((test) => {
+      it.only(`calls an final error handler if an ${test.ErrorClass.name} was thrown`, () => {
+        const fn = sinon.spy((req, res, next) => { throw new test.ErrorClass('Beer is empty!') })
+        const fn2 = sinon.spy((err, req, res, next) => { next() })
+        const jsonStub = sinon.stub()
+        const sendStub = sinon.stub()
+        const statusStub = sinon.stub()
+        const acceptsStub = sinon.stub()
+        acceptsStub.returns(true)
+
+        server.use(fn)
+        server.errorHandler(fn2)
+
+        return server.dispatch({
+          path: '/foo/bla',
+          method: 'GET',
+          accepts: acceptsStub
+        }, {
+          status: statusStub,
+          send: sendStub,
+          json: jsonStub
+        }).then(() => {
+          inspect(fn2).wasCalledOnce()
+          inspect(jsonStub).wasCalledOnce()
+          inspect(sendStub).wasNotCalled()
+          inspect(statusStub).wasCalledOnce()
+          inspect(statusStub).wasCalledWith(test.status)
+          inspect(jsonStub).wasCalledWith({
+            status: test.status,
+            error: test.error,
+            message: test.message
+          })
+        })
       })
     })
   })

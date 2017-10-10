@@ -180,6 +180,87 @@ describe('Router', () => {
         ctx.responseTime(50)
       })
     })
+
+    it('handles errors thrown in a post route', () => {
+      const postStub = sinon.stub();
+      const errStub = sinon.stub();
+      postStub.throws(new Error('Beer is empty!'));
+      errStub.returns({ err: 'beer-empty' });
+      router.registerRoutes({
+        post (req, res, next) {
+          throw new Error('Oh shit')
+        },
+        slug: '/foo'
+      })
+
+      router.errorHandler(function errHandler (err, req, res, next, finish) {
+        res.status(501)
+        res.send({})
+        finish()
+      })
+
+      inspect(router).isObject()
+
+      return apiInspect.post('/foo').test((ctx) => {
+        ctx.statusCode(501)
+        ctx.contentType('application/json')
+        ctx.responseTime(50)
+      })
+    })
+
+    it('handles errors thrown in a put route', () => {
+      const putStub = sinon.stub();
+      const errStub = sinon.stub();
+      putStub.throws(new Error('Beer is empty!'));
+      errStub.returns({ err: 'beer-empty' });
+      router.registerRoutes({
+        put (req, res, next) {
+          throw new Error('Oh shit')
+        },
+        slug: '/foo'
+      })
+
+      router.errorHandler(function errHandler (err, req, res, next, finish) {
+        res.status(501)
+        res.send({})
+        finish()
+      })
+
+      inspect(router).isObject()
+
+      return apiInspect.put('/foo').test((ctx) => {
+        ctx.statusCode(501)
+        ctx.contentType('application/json')
+        ctx.responseTime(50)
+      })
+    })
+
+    it('handles errors thrown in a delete route', () => {
+      const deleteStub = sinon.stub();
+      const errStub = sinon.stub();
+      deleteStub.throws(new Error('Beer is empty!'));
+      errStub.returns({ err: 'beer-empty' });
+      router.registerRoutes({
+        delete (req, res, next) {
+          throw new Error('Oh shit')
+        },
+        slug: '/foo'
+      })
+
+      router.errorHandler(function errHandler (err, req, res, next, finish) {
+        res.status(501)
+        res.send({})
+        finish()
+      })
+
+      inspect(router).isObject()
+
+      return apiInspect.delete('/foo').test((ctx) => {
+        ctx.statusCode(501)
+        ctx.contentType('application/json')
+        ctx.responseTime(50)
+      })
+    })
   })
 
   describe('createConfig', () => {

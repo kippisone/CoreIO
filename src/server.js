@@ -79,8 +79,11 @@ export default function ServerFactory(CoreIO) {
     setDefaultRoutes () {
       this.bucketChain.errBucket.final(function finalErrorHandler (err, req, res, next) {
         // call final err
-        res.status(500)
-        res.send(err)
+        res.status(err.status || 500)
+        req.accepts('json') && typeof err.toJSON === 'function'
+          ? res.json(err.toJSON())
+          : res.send(err.toString())
+
         next()
       })
     }

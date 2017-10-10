@@ -170,7 +170,7 @@ export default function Router(CoreIO) {
           typeof data === 'object' && req.accepts('json') ? res.json(data) : res.send(data);
         } else {
           res.status(200)
-          typeof p === 'object' && req.accepts('json') ? res.json(p) : ses.send(p);
+          typeof p === 'object' && req.accepts('json') ? res.json(p) : res.send(p);
         }
       };
     }
