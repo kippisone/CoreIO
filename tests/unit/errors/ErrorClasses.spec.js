@@ -5,7 +5,7 @@ inspect.useSinon(sinon)
 const testArr = require('./errorConf')
 
 testArr.forEach((test) => {
-  describe.only(test.name, () => {
+  describe(test.name, () => {
     const err = new test.ErrorClass(test.error)
 
     describe('class', () => {
@@ -36,12 +36,46 @@ testArr.forEach((test) => {
           message: test.message
         })
       })
+
+      it('returns an extended JSON object if level is set to 2', () => {
+        inspect(err.toJSON(2)).isEql({
+          status: test.status,
+          type: test.name,
+          message: test.message,
+          error: test.error
+        })
+      })
+
+      it('returns an extended JSON object with stack trace if level is set to 3', () => {
+        inspect(err.toJSON(3)).isEql({
+          status: test.status,
+          type: test.name,
+          message: test.message,
+          error: test.error,
+          stack: inspect.match.str
+        })
+
+        const extendedError = err.toJSON(3)
+        inspect(extendedError.stack).doesContain(`${test.status} ${test.message}`)
+      })
     })
 
     describe('toString', () => {
       it('returns a string message', () => {
         inspect(err.toString()).isEql(
           `${test.status} ${test.message}`
+        )
+      })
+
+      it('returns an extended string message', () => {
+        inspect(err.toString(2)).isEql(
+          `${test.status} ${test.message}\n\n${test.error}`
+        )
+      })
+
+      it('returns an extended string message with stacktrace', () => {
+        inspect(err.toString(3)).doesContain(
+          `${test.status} ${test.message}\n\n${test.error}\n\n${test.status} ${test.message}`
         )
       })
     })
