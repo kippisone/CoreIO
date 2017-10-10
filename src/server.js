@@ -50,10 +50,10 @@ export default function ServerFactory(CoreIO) {
       app.set('view engine', 'fire')
 
       this.bucketChain = new Bucketchain()
-      this.bucketChain.bucket('prepareBucket')
-      this.bucketChain.bucket('routerBucket')
-      this.bucketChain.bucket('presendBucket')
-      this.bucketChain.errorBucket('errBucket')
+      this.prepareBucket = this.bucketChain.bucket('prepareBucket')
+      this.routerBucket = this.bucketChain.bucket('routerBucket')
+      this.presendBucket = this.bucketChain.bucket('presendBucket')
+      this.errorBucket = this.bucketChain.errorBucket('errorBucket')
 
       this.setDefaultRoutes()
 
@@ -78,7 +78,7 @@ export default function ServerFactory(CoreIO) {
     }
 
     setDefaultRoutes () {
-      this.bucketChain.errBucket.final(function finalErrorHandler (err, req, res, next) {
+      this.errorBucket.final(function finalErrorHandler (err, req, res, next) {
         // call final err
         err.level = this.errorLevel
         res.status(err.status || 500)
@@ -137,11 +137,11 @@ export default function ServerFactory(CoreIO) {
         }
 
         for (let i = 1; i < args.length; i++) {
-          this.bucketChain.prepareBucket.when(condition).add(args[i])
+          this.prepareBucket.when(condition).add(args[i])
         }
       } else {
         for (let i = 0; i < args.length; i++) {
-          this.bucketChain.prepareBucket.add(args[i])
+          this.prepareBucket.add(args[i])
         }
       }
     }
@@ -169,11 +169,11 @@ export default function ServerFactory(CoreIO) {
         }
 
         for (let i = 1; i < args.length; i++) {
-          this.bucketChain.presendBucket.when(condition).add(args[i])
+          this.presendBucket.when(condition).add(args[i])
         }
       } else {
         for (let i = 0; i < args.length; i++) {
-          this.bucketChain.presendBucket.add(args[i])
+          this.presendBucket.add(args[i])
         }
       }
     }
@@ -192,12 +192,12 @@ export default function ServerFactory(CoreIO) {
 
       const routeObj = this.__routes.get(`${method} ${route}`)
       for (let i = 0; i < funcs.length; i++) {
-        this.bucketChain.routerBucket.when(routeObj.condition).add(funcs[i])
+        this.routerBucket.when(routeObj.condition).add(funcs[i])
       }
     }
 
     errorHandler (fn) {
-      this.bucketChain.errBucket.add(fn)
+      this.errorBucket.add(fn)
     }
 
     getCorsOoptions () {
@@ -209,7 +209,7 @@ export default function ServerFactory(CoreIO) {
     }
 
     runErrorBucket (thisContext, err, req, res) {
-      this.errBucket.runWith(thisContext, err, req, res)
+      this.errorBucket.runWith(thisContext, err, req, res)
     }
 
     getAllRoutes (returnMiddlewares) {
