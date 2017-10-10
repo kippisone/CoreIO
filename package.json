@@ -4,7 +4,8 @@
   "description": "Core.io is a model list framework and builds the backend part of XQCore",
   "main": "lib/coreio.js",
   "scripts": {
-    "test": "mocha --reporter lagoon-reporter tests/*.spec.js tests/**/*.spec.js  tests/**/**/*.spec.js",
+    "test": "mocha --reporter lagoon-reporter tests/unit/*.spec.js tests/**/*.spec.js  tests/**/**/*.spec.js",
+    "bench": "mocha --reporter lagoon-reporter tests/testberry/*.bench.js",
     "build": "babel src -d lib",
     "dev": "babel src -d lib --watch",
     "prepublish": "npm run build"
@@ -25,7 +26,8 @@
     "inspect.js": "^1.9.0",
     "lagoon-reporter": "^0.3.3",
     "mocha": "^4.0.1",
-    "sinon": "^4.0.1"
+    "sinon": "^4.0.1",
+    "testberry": "^0.1.1"
   },
   "dependencies": {
     "co": "^4.6.0",
