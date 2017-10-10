@@ -18,6 +18,7 @@ export default function ServerFactory(CoreIO) {
     constructor(conf) {
       this.port = conf.port;
       this.host = conf.host || '0.0.0.0';
+      this.errorLevel = conf.errorLevel || 1
 
       const portNumber = `${this.port}`
 
@@ -79,13 +80,14 @@ export default function ServerFactory(CoreIO) {
     setDefaultRoutes () {
       this.bucketChain.errBucket.final(function finalErrorHandler (err, req, res, next) {
         // call final err
+        err.level = this.errorLevel
         res.status(err.status || 500)
         req.accepts('json') && typeof err.toJSON === 'function'
           ? res.json(err.toJSON())
           : res.send(err.toString())
 
         next()
-      })
+      }.bind(this))
     }
 
     /**

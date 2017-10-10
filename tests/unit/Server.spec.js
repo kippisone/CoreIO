@@ -273,6 +273,8 @@ describe('Server', () => {
       server = new CoreIO.Server({
         noServer: true
       })
+
+      server.errorLevel = 1
     })
 
     afterEach(() => {
@@ -314,7 +316,7 @@ describe('Server', () => {
 
 
     erroClassArr.forEach((test) => {
-      it.skip(`calls an final error handler if an ${test.ErrorClass.name} was thrown`, () => {
+      it(`calls an final error handler if an ${test.ErrorClass.name} was thrown`, () => {
         const fn = sinon.spy((req, res, next) => { throw new test.ErrorClass('Beer is empty!') })
         const fn2 = sinon.spy((err, req, res, next) => { next() })
         const jsonStub = sinon.stub()
@@ -342,9 +344,180 @@ describe('Server', () => {
           inspect(statusStub).wasCalledWith(test.status)
           inspect(jsonStub).wasCalledWith({
             status: test.status,
-            error: test.error,
-            message: test.message
+            message: test.message,
+            type: test.name
           })
+        })
+      })
+
+      it(`return an extended error for ${test.ErrorClass.name} if level is set to 2`, () => {
+        const fn = sinon.spy((req, res, next) => { throw new test.ErrorClass(test.error) })
+        const fn2 = sinon.spy((err, req, res, next) => { next() })
+        const jsonStub = sinon.stub()
+        const sendStub = sinon.stub()
+        const statusStub = sinon.stub()
+        const acceptsStub = sinon.stub()
+        acceptsStub.returns(true)
+
+        server.use(fn)
+        server.errorHandler(fn2)
+        server.errorLevel = 2
+
+        return server.dispatch({
+          path: '/foo/bla',
+          method: 'GET',
+          accepts: acceptsStub
+        }, {
+          status: statusStub,
+          send: sendStub,
+          json: jsonStub
+        }).then(() => {
+          inspect(fn2).wasCalledOnce()
+          inspect(jsonStub).wasCalledOnce()
+          inspect(sendStub).wasNotCalled()
+          inspect(statusStub).wasCalledOnce()
+          inspect(statusStub).wasCalledWith(test.status)
+          inspect(jsonStub).wasCalledWith({
+            status: test.status,
+            message: test.message,
+            type: test.name,
+            error: test.error
+          })
+        })
+      })
+
+      it(`return an extended error with stack trace for ${test.ErrorClass.name} if level is set to 3`, () => {
+        const fn = sinon.spy((req, res, next) => { throw new test.ErrorClass(test.error) })
+        const fn2 = sinon.spy((err, req, res, next) => { next() })
+        const jsonStub = sinon.stub()
+        const sendStub = sinon.stub()
+        const statusStub = sinon.stub()
+        const acceptsStub = sinon.stub()
+        acceptsStub.returns(true)
+
+        server.use(fn)
+        server.errorHandler(fn2)
+        server.errorLevel = 3
+
+        return server.dispatch({
+          path: '/foo/bla',
+          method: 'GET',
+          accepts: acceptsStub
+        }, {
+          status: statusStub,
+          send: sendStub,
+          json: jsonStub
+        }).then(() => {
+          inspect(fn2).wasCalledOnce()
+          inspect(jsonStub).wasCalledOnce()
+          inspect(sendStub).wasNotCalled()
+          inspect(statusStub).wasCalledOnce()
+          inspect(statusStub).wasCalledWith(test.status)
+          inspect(jsonStub).wasCalledWith({
+            status: test.status,
+            message: test.message,
+            type: test.name,
+            error: test.error,
+            stack: sinon.match.string
+          })
+        })
+      })
+
+      it(`calls an final error handler if an ${test.ErrorClass.name} was thrown (text/plain)`, () => {
+        const fn = sinon.spy((req, res, next) => { throw new test.ErrorClass('Beer is empty!') })
+        const fn2 = sinon.spy((err, req, res, next) => { next() })
+        const jsonStub = sinon.stub()
+        const sendStub = sinon.stub()
+        const statusStub = sinon.stub()
+        const acceptsStub = sinon.stub()
+        acceptsStub.returns(false)
+
+        server.use(fn)
+        server.errorHandler(fn2)
+
+        return server.dispatch({
+          path: '/foo/bla',
+          method: 'GET',
+          accepts: acceptsStub
+        }, {
+          status: statusStub,
+          send: sendStub,
+          json: jsonStub
+        }).then(() => {
+          inspect(fn2).wasCalledOnce()
+          inspect(sendStub).wasCalledOnce()
+          inspect(jsonStub).wasNotCalled()
+          inspect(statusStub).wasCalledOnce()
+          inspect(statusStub).wasCalledWith(test.status)
+          inspect(sendStub).wasCalledWith(
+            `${test.status} ${test.message}`
+          )
+        })
+      })
+
+      it(`return an extended error for ${test.ErrorClass.name} if level is set to 2 (text/plain)`, () => {
+        const fn = sinon.spy((req, res, next) => { throw new test.ErrorClass(test.error) })
+        const fn2 = sinon.spy((err, req, res, next) => { next() })
+        const jsonStub = sinon.stub()
+        const sendStub = sinon.stub()
+        const statusStub = sinon.stub()
+        const acceptsStub = sinon.stub()
+        acceptsStub.returns(false)
+
+        server.use(fn)
+        server.errorHandler(fn2)
+        server.errorLevel = 2
+
+        return server.dispatch({
+          path: '/foo/bla',
+          method: 'GET',
+          accepts: acceptsStub
+        }, {
+          status: statusStub,
+          send: sendStub,
+          json: jsonStub
+        }).then(() => {
+          inspect(fn2).wasCalledOnce()
+          inspect(sendStub).wasCalledOnce()
+          inspect(jsonStub).wasNotCalled()
+          inspect(statusStub).wasCalledOnce()
+          inspect(statusStub).wasCalledWith(test.status)
+          inspect(sendStub).wasCalledWith(
+            `${test.status} ${test.message}\n\n${test.error}`
+          )
+        })
+      })
+
+      it(`return an extended error with stack trace for ${test.ErrorClass.name} if level is set to 3 (text/plain)`, () => {
+        const fn = sinon.spy((req, res, next) => { throw new test.ErrorClass(test.error) })
+        const fn2 = sinon.spy((err, req, res, next) => { next() })
+        const jsonStub = sinon.stub()
+        const sendStub = sinon.stub()
+        const statusStub = sinon.stub()
+        const acceptsStub = sinon.stub()
+        acceptsStub.returns(false)
+
+        server.use(fn)
+        server.errorHandler(fn2)
+        server.errorLevel = 3
+
+        return server.dispatch({
+          path: '/foo/bla',
+          method: 'GET',
+          accepts: acceptsStub
+        }, {
+          status: statusStub,
+          send: sendStub,
+          json: jsonStub
+        }).then(() => {
+          inspect(fn2).wasCalledOnce()
+          inspect(sendStub).wasCalledOnce()
+          inspect(jsonStub).wasNotCalled()
+          inspect(statusStub).wasCalledOnce()
+          inspect(statusStub).wasCalledWith(test.status)
+          inspect(sendStub).wasCalledWithMatch(
+            `${test.status} ${test.message}\n\n${test.error}\n\nError: ${test.message}`
+          )
         })
       })
     })

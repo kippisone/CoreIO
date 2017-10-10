@@ -37,6 +37,8 @@ class APIError extends Error {
   }
 
   toString (level) {
+    level = level || this.level
+    
     let err = `${this.status} ${this.message}`
 
     if (level >= 2) {
