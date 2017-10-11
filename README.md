@@ -3,10 +3,29 @@ CoreIO
 
 [![Build Status](https://travis-ci.org/Andifeind/CoreIO.svg?branch=master)](https://travis-ci.org/Andifeind/CoreIO)
 
-CoreIO is a node.js backend model/list system. It keeps data between a web frontent and the backend in sync. Web clients could be connected with REST or Sockets and each model can be connected to a database like MongoDB or Redis as well. CoreIO is the backend part of XQCore. It works pretty well together.
+CoreIO is a node.js backend model/list system. It keeps data between a web-based UI and the backend in sync. Web clients can connect with REST or Sockets and each model can be connected to a database like MongoDB or Redis as well. CoreIO is the backend part of XQCore. It works pretty well together.
 
 Usage
 -----
+
+### REST API
+
+CoreIO has a simple REST API setup. It starts a web-sever automatically in the background if it's required.
+
+A REST API setup may looks like:
+
+```js
+import CoreIO from 'coreio'
+
+CoreIO.api('/api/hello', {
+  get() {
+    return 'Hello World'
+  }
+})
+```
+
+A call of `api()` starts a web server in the background if none was alweady started. It registers a GET route and returns `Hello World` if it gets called.
+
 
 CoreIO knows models or lists. Lists are simply collections of models. Each model represents a dataset.
 

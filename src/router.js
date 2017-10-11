@@ -1,3 +1,5 @@
+import path from 'path'
+
 /**
  * Router module
  *
@@ -32,6 +34,7 @@ export default function Router(CoreIO) {
 
       this.server = server;
       this.app = server.app;
+      this.mount = this.validatePath(conf.mount, '')
 
       if (conf.reset) {
         this.removeAllRoutes(true)
@@ -55,8 +58,9 @@ export default function Router(CoreIO) {
         if (c.slug) {
           for (const method of HTTP_METHODS) {
             if (c[method]) {
-              log.sys(`Register route ${method.toUpperCase()} ${c.slug}`);
-              this.server.route(method.toUpperCase(), c.slug, this.requestHandler(c[method]))
+              const slug = path.join(this.mount, c.slug)
+              log.sys(`Register route ${method.toUpperCase()} ${slug}`);
+              this.server.route(method.toUpperCase(), slug, this.requestHandler(c[method]))
             }
           }
         }
@@ -217,6 +221,13 @@ export default function Router(CoreIO) {
 
     errorHandler (fn) {
       this.server.errorHandler(fn)
+    }
+
+    validatePath(slug, defaultSlug) {
+      slug = slug || defaultSlug
+      if (!slug) return slug
+      if (!/^\//.test(slug)) throw new Error(`Path validation failed for path '${slug}'! It has to start with a '/'`)
+      return  slug.replace(/\/+$/, '')
     }
   }
 

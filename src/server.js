@@ -16,8 +16,8 @@ export default function ServerFactory(CoreIO) {
 
   class Server {
     constructor(conf) {
-      this.port = conf.port;
-      this.host = conf.host || '0.0.0.0';
+      this.port = conf.port || CoreIO.httpPort;
+      this.host = conf.host || CoreIO.httpHost;
       this.errorLevel = conf.errorLevel || 1
 
       const portNumber = `${this.port}`
@@ -26,13 +26,12 @@ export default function ServerFactory(CoreIO) {
         return CoreIO.__registeredServers.get(portNumber)
       } else {
         this.app = express();
+        this.__routes = new Map()
         CoreIO.__registeredServers.set(portNumber, this)
 
         this.connect({
           noServer: conf.noServer
         });
-
-        this.__routes = new Map()
       }
     }
 
@@ -64,8 +63,8 @@ export default function ServerFactory(CoreIO) {
       })
 
       if (!options.noServer) {
-        log.sys('Listen on port', CoreIO.httpPort)
-        app.listen(CoreIO.httpPort, CoreIO.httpHost)
+        log.sys('Listen on port', this.port, this.host)
+        app.listen(this.port, this.host)
       }
 
       /**
