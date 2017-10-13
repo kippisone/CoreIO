@@ -195,28 +195,18 @@ export default function Router(CoreIO) {
       }
     }
 
+    /**
+     * Remove all registered routes
+     *
+     * @method  removeAllRoutes
+     * @param   {bool} removeMiddlewares Remove middlewares as well
+     */
     removeAllRoutes (removeMiddlewares) {
       this.server.removeAllRoutes(removeMiddlewares)
     }
 
     getAllRoutes (returnMiddlewares) {
       return this.server.getAllRoutes(returnMiddlewares)
-    }
-
-    resetRoutes() {
-      let i = 0
-      while (true) {
-        const layer = this.app._router.stack[i]
-        if (!layer) {
-          break
-        }
-
-        if (layer.name === 'bound dispatch') {
-          this.app._router.stack.splice(i, 1)
-        } else {
-          i += 1
-        }
-      }
     }
 
     errorHandler (fn) {
