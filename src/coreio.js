@@ -6,12 +6,26 @@ import Service from './service';
 import Server from './server';
 import Router from './router';
 
+import APIError from './errors/APIError'
+import BadGatewayError from './errors/BadGatewayError'
+import BadRequestError from './errors/BadRequestError'
+import ForbiddenError from './errors/ForbiddenError'
+import GatewayTimeoutError from './errors/GatewayTimeoutError'
+import InternalServerError from './errors/InternalServerError'
+import NotAcceptableError from './errors/NotAcceptableError'
+import NotFoundError from './errors/NotFoundError'
+import NotImplementedError from './errors/NotImplementedError'
+import RequestTimeoutError from './errors/RequestTimeoutError'
+import ServiceUnavailableError from './errors/ServiceUnavailableError'
+import UnauthorizedError from './errors/UnauthorizedError'
+
 const CoreIO = {
   logLevel: process.env.NODE_ENV === 'test' ? 'error' : 'sys',
   socketPort: 9889,
   socketHost: '0.0.0.0',
   httpPort: 6446,
-  httpHost: '0.0.0.0'
+  httpHost: '0.0.0.0',
+  errorLevel: 1
 };
 
 CoreIO.conf = {};
@@ -29,6 +43,19 @@ CoreIO.Service = Service(CoreIO);
 CoreIO.Server = Server(CoreIO);
 CoreIO.Socket = Socket(CoreIO);
 CoreIO.Router = Router(CoreIO);
+
+CoreIO.APIError = APIError
+CoreIO.BadGatewayError = BadGatewayError
+CoreIO.BadRequestError = BadRequestError
+CoreIO.ForbiddenError = ForbiddenError
+CoreIO.GatewayTimeoutError = GatewayTimeoutError
+CoreIO.InternalServerError = InternalServerError
+CoreIO.NotAcceptableError = NotAcceptableError
+CoreIO.NotFoundError = NotFoundError
+CoreIO.NotImplementedError = NotImplementedError
+CoreIO.RequestTimeoutError = RequestTimeoutError
+CoreIO.ServiceUnavailableError = ServiceUnavailableError
+CoreIO.UnauthorizedError = UnauthorizedError
 
 CoreIO.CoreEvents = new CoreIO.Event();
 

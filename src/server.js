@@ -9,6 +9,7 @@ import Bucketchain  from 'superchain/src/Bucketchain'
 import pathToRegexp from 'path-to-regexp'
 
 import Route from './utils/Route'
+import NotFoundError from './errors/NotFoundError'
 
 export default function ServerFactory(CoreIO) {
   let log = require('logtopus').getLogger('coreio');
@@ -18,7 +19,7 @@ export default function ServerFactory(CoreIO) {
     constructor(conf) {
       this.port = conf.port || CoreIO.httpPort;
       this.host = conf.host || CoreIO.httpHost;
-      this.errorLevel = conf.errorLevel || 1
+      this.errorLevel = conf.errorLevel || CoreIO.errorLevel
 
       const portNumber = `${this.port}`
 
@@ -86,6 +87,10 @@ export default function ServerFactory(CoreIO) {
           : res.send(err.toString())
 
         next()
+      }.bind(this))
+
+      this.presendBucket.final(function notFoundHandler (req, res, next) {
+        throw new NotFoundError(`Page ${req.path} was not found`)
       }.bind(this))
     }
 
