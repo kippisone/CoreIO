@@ -33,9 +33,9 @@
     "co": "^4.6.0",
     "cors": "^2.8.4",
     "firetpl": "^0.6.2",
-    "logtopus": "^0.3.0",
+    "logtopus": "^1.0.1",
     "path-to-regexp": "^2.0.0",
     "sockjs": "^0.3.17",
-    "superchain": "^2.0.2"
+    "superchain": "^2.1.0"
   }
 }
