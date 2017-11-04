@@ -505,7 +505,7 @@ describe('Server', () => {
           inspect(statusStub).wasCalledOnce()
           inspect(statusStub).wasCalledWith(test.status)
           inspect(sendStub).wasCalledWithMatch(
-            `${test.status} ${test.message}\n\n${test.error}\n\n${test.status} ${test.message}`
+            `${test.status} ${test.message}\n\n${test.error}\n\nError: ${test.message}`
           )
         })
       })
