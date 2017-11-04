@@ -157,24 +157,11 @@ module.exports = function(CoreIO) {
       name = undefined;
     }
 
-    var Proto = function(_name, _options) {
-      //TODO call this later, ready state will be set before _options had been run
+    var Proto = function(modelData) {
       CoreIO.Model.call(this, name, options);
 
-      if (_name) {
-        if (typeof _name === 'string') {
-          name = _name;
-        }
-        else {
-          _options = _name;
-        }
-
-        if (typeof _options === 'function') {
-          _options.call(this, this);
-        }
-        else if (typeof _options === 'object') {
-          Object.assign(this, _options);
-        }
+      if (modelData) {
+        this.set(modelData)
       }
     };
 
