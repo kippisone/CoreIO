@@ -161,6 +161,10 @@ function Router(CoreIO) {
           newConf.push({
             slug: slug,
             async get(req, res) {
+              if (List.isList) {
+                return List.toArray()
+              }
+
               const list = new List();
               await list.fetch()
               return list.toArray();

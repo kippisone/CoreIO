@@ -59,6 +59,13 @@ module.exports = function(CoreIO) {
      */
     this.debug = CoreIO.debug;
 
+    /**
+     * Identifies class as a list instance
+     * @type {Boolean}
+     * @readonly
+     */
+    this.isList = true
+
     if (conf === undefined) {
       conf = {};
     }
@@ -157,8 +164,12 @@ module.exports = function(CoreIO) {
       name = undefined;
     }
 
-    var Proto = function() {
+    var Proto = function(listData) {
       CoreIO.List.call(this, name, options);
+
+      if (listData) {
+        this.push(listData)
+      }
     };
 
     Proto.prototype = Object.create(CoreIO.List.prototype);
