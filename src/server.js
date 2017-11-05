@@ -17,9 +17,11 @@ export default function ServerFactory(CoreIO) {
 
   class Server {
     constructor(conf) {
+      conf = conf || {}
       this.port = conf.port || CoreIO.httpPort;
       this.host = conf.host || CoreIO.httpHost;
       this.errorLevel = conf.errorLevel || CoreIO.errorLevel
+      this.conf = conf
 
       const portNumber = `${this.port}`
 
@@ -50,6 +52,10 @@ export default function ServerFactory(CoreIO) {
       app.set('view engine', 'fire')
 
       this.bucketChain = new Bucketchain()
+      if (this.conf.debug) {
+        this.bucketChain.debug = true
+      }
+
       this.prepareBucket = this.bucketChain.bucket('prepareBucket')
       this.routerBucket = this.bucketChain.bucket('routerBucket')
       this.presendBucket = this.bucketChain.bucket('presendBucket')
@@ -91,6 +97,7 @@ export default function ServerFactory(CoreIO) {
 
       this.presendBucket.final(function notFoundHandler (req, res, next) {
         throw new NotFoundError(`Page ${req.path} was not found`)
+        // return Promise.reject(new NotFoundError(`Page ${req.path} was not found`))
       }.bind(this))
     }
 

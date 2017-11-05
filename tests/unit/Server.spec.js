@@ -120,7 +120,7 @@ describe('Server', () => {
     it('register a middleware under a specific path', () => {
       const fn = sinon.spy((req, res, next) => { next() })
       const fn2 = sinon.spy((req, res, next) => { next() })
-      const fn3 = sinon.spy((req, res, next) => { next() })
+      const fn3 = sinon.spy((req, res, next, exit) => { exit() })
 
       server.use(fn)
       server.useAfter(fn3)
@@ -138,7 +138,7 @@ describe('Server', () => {
       const fn = sinon.spy((req, res, next) => { next() })
       const fn2 = sinon.spy((req, res, next) => { next() })
       const fn3 = sinon.spy((req, res, next) => { next() })
-      const fn4 = sinon.spy((req, res, next) => { next() })
+      const fn4 = sinon.spy((req, res, next, exit) => { exit() })
 
       server.useAfter(fn, fn2, fn3, fn4)
 
@@ -156,7 +156,8 @@ describe('Server', () => {
 
     beforeEach(() => {
       server = new CoreIO.Server({
-        noServer: true
+        noServer: true,
+        debug: true
       })
     })
 
@@ -167,7 +168,7 @@ describe('Server', () => {
     it('register a middleware under a specific path', () => {
       const fn = sinon.spy((req, res, next) => { next() })
       const fn2 = sinon.spy((req, res, next) => { next() })
-      const fn3 = sinon.spy((req, res, next) => { next() })
+      const fn3 = sinon.spy((req, res, next, exit) => { exit() })
 
       server.use('/foo', fn)
       server.useAfter('/foo', fn3)
@@ -187,7 +188,7 @@ describe('Server', () => {
       const fn = sinon.spy((req, res, next) => { next() })
       const fn2 = sinon.spy((req, res, next) => { next() })
       const fn3 = sinon.spy((req, res, next) => { next() })
-      const fn4 = sinon.spy((req, res, next) => { next() })
+      const fn4 = sinon.spy((req, res, next, exit) => { exit() })
 
       server.use('/foo', fn, fn2, fn3, fn4)
 
@@ -501,7 +502,7 @@ describe('Server', () => {
           inspect(statusStub).wasCalledOnce()
           inspect(statusStub).wasCalledWith(test.status)
           inspect(sendStub).wasCalledWithMatch(
-            `${test.status} ${test.message}\n\n${test.error}\n\nError: ${test.message}`
+            `${test.status} ${test.message}\n\n${test.error}\n\n${test.status} ${test.message}`
           )
         })
       })
