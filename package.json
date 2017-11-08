@@ -26,7 +26,7 @@
     "inspect.js": "^1.9.0",
     "lagoon-reporter": "^0.3.3",
     "mocha": "^4.0.1",
-    "sinon": "^4.0.1",
+    "sinon": "4.1.2",
     "testberry": "^0.1.1"
   },
   "dependencies": {
@@ -36,6 +36,6 @@
     "logtopus": "^1.0.1",
     "path-to-regexp": "^2.0.0",
     "sockjs": "^0.3.17",
-    "superchain": "2.3.0"
+    "superchain": "2.3.1"
   }
 }
