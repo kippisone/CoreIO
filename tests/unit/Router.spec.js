@@ -166,10 +166,10 @@ describe('Router', () => {
         slug: '/foo'
       })
 
-      router.errorHandler(function errHandler (err, req, res, next, finish) {
+      router.errorHandler(function errHandler (err, req, res, next) {
         res.status(501)
         res.send({})
-        finish()
+        next()
       })
 
       inspect(router).isObject()

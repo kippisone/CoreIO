@@ -468,7 +468,7 @@ describe('Server', () => {
           inspect(jsonStub).wasNotCalled()
           inspect(statusStub).wasCalledOnce()
           inspect(statusStub).wasCalledWith(test.status)
-          inspect(sendStub).wasCalledWith(
+          inspect(sendStub).wasCalledWithMatch(
             `${test.status} ${test.message}\n\n${test.error}`
           )
         })
@@ -487,6 +487,9 @@ describe('Server', () => {
         server.errorHandler(fn2)
         server.errorLevel = 3
 
+        const err = new test.ErrorClass(test.error)
+        err.level = 3
+        inspect.print(err.toString())
         return server.dispatch({
           path: '/foo/bla',
           method: 'GET',
