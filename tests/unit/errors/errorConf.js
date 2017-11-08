@@ -1,16 +1,16 @@
 'use strict'
 
-const BadGatewayError = require('../../../lib/errors/BadGatewayError')
-const BadRequestError = require('../../../lib/errors/BadRequestError')
-const ForbiddenError = require('../../../lib/errors/ForbiddenError')
-const GatewayTimeoutError = require('../../../lib/errors/GatewayTimeoutError')
-const InternalServerError = require('../../../lib/errors/InternalServerError')
-const NotAcceptableError = require('../../../lib/errors/NotAcceptableError')
-const NotFoundError = require('../../../lib/errors/NotFoundError')
-const NotImplementedError = require('../../../lib/errors/NotImplementedError')
-const RequestTimeoutError = require('../../../lib/errors/RequestTimeoutError')
-const ServiceUnavailableError = require('../../../lib/errors/ServiceUnavailableError')
-const UnauthorizedError = require('../../../lib/errors/UnauthorizedError')
+const BadGatewayError = require('../../../src/errors/BadGatewayError')
+const BadRequestError = require('../../../src/errors/BadRequestError')
+const ForbiddenError = require('../../../src/errors/ForbiddenError')
+const GatewayTimeoutError = require('../../../src/errors/GatewayTimeoutError')
+const InternalServerError = require('../../../src/errors/InternalServerError')
+const NotAcceptableError = require('../../../src/errors/NotAcceptableError')
+const NotFoundError = require('../../../src/errors/NotFoundError')
+const NotImplementedError = require('../../../src/errors/NotImplementedError')
+const RequestTimeoutError = require('../../../src/errors/RequestTimeoutError')
+const ServiceUnavailableError = require('../../../src/errors/ServiceUnavailableError')
+const UnauthorizedError = require('../../../src/errors/UnauthorizedError')
 
 const testArr = [
   { ErrorClass: BadGatewayError, status: 502, message: 'Bad Gateway', error: 'Error message', name: 'BadGatewayError' },

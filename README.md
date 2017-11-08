@@ -5,6 +5,10 @@ CoreIO
 
 CoreIO is a node.js backend model/list system. It keeps data between a web-based UI and the backend in sync. Web clients can connect with REST or Sockets and each model can be connected to a database like MongoDB or Redis as well. CoreIO is the backend part of XQCore. It works pretty well together.
 
+Requirements
+
+Node.js >= 8.0.0
+
 Usage
 -----
 

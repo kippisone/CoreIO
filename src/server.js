@@ -1,17 +1,17 @@
-import path from 'path'
+const path = require('path')
 
-import logtopus from 'logtopus'
-import express from 'express'
-import bodyParser from 'body-parser'
-import cors from 'cors'
-import firetpl from 'firetpl'
-import Bucketchain  from 'superchain/src/Bucketchain'
-import pathToRegexp from 'path-to-regexp'
+const logtopus = require('logtopus')
+const express = require('express')
+const bodyParser = require('body-parser')
+const cors = require('cors')
+const firetpl = require('firetpl')
+const Bucketchain = require('superchain/src/Bucketchain')
+const pathToRegexp = require('path-to-regexp')
 
-import Route from './utils/Route'
-import NotFoundError from './errors/NotFoundError'
+const Route = require('./utils/Route')
+const NotFoundError = require('./errors/NotFoundError')
 
-export default function ServerFactory(CoreIO) {
+function ServerFactory(CoreIO) {
   let log = require('logtopus').getLogger('coreio');
   CoreIO.__registeredServers = new Map();
 
@@ -235,3 +235,5 @@ export default function ServerFactory(CoreIO) {
 
   return Server;
 }
+
+module.exports = ServerFactory

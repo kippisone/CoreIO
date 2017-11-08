@@ -4,7 +4,7 @@ let inspect = require('inspect.js');
 let sinon = require('sinon');
 inspect.useSinon(sinon);
 
-let CoreIO = require('../lib/coreio');
+let CoreIO = require('../src/coreio');
 
 describe('Utils', function() {
 	'use strict';

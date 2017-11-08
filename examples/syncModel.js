@@ -1,6 +1,6 @@
 'use strict';
 
-const CoreIO = require('../lib/coreio');
+const CoreIO = require('../src/coreio');
 const MongoDBService = require('coreio-mongodb')(CoreIO);
 
 CoreIO.setConf('mongodb', 'mongodb://localhost:27017/coreio-example');

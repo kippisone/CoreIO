@@ -2,7 +2,7 @@ const inspect = require('inspect.js')
 const sinon = require('sinon')
 inspect.useSinon(sinon)
 
-const Route = require('../../lib/utils/Route').default
+const Route = require('../../src/utils/Route')
 
 describe('Route', () => {
   describe('class', () => {

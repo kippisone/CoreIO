@@ -1,6 +1,6 @@
-import pathToRegexp from 'path-to-regexp'
+const pathToRegexp = require('path-to-regexp')
 
-export default class Route {
+class Route {
   constructor (method, route) {
     this.method = method
     this.route = route
@@ -19,3 +19,5 @@ export default class Route {
     }
   }
 }
+
+module.exports = Route

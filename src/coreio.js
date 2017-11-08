@@ -1,23 +1,23 @@
 'use strict';
 
-import Utils from './utils';
-import Socket from './socket';
-import Service from './service';
-import Server from './server';
-import Router from './router';
+const Utils = require('./utils')
+const Socket = require('./socket')
+const Service = require('./service')
+const Server = require('./server')
+const Router = require('./router')
 
-import APIError from './errors/APIError'
-import BadGatewayError from './errors/BadGatewayError'
-import BadRequestError from './errors/BadRequestError'
-import ForbiddenError from './errors/ForbiddenError'
-import GatewayTimeoutError from './errors/GatewayTimeoutError'
-import InternalServerError from './errors/InternalServerError'
-import NotAcceptableError from './errors/NotAcceptableError'
-import NotFoundError from './errors/NotFoundError'
-import NotImplementedError from './errors/NotImplementedError'
-import RequestTimeoutError from './errors/RequestTimeoutError'
-import ServiceUnavailableError from './errors/ServiceUnavailableError'
-import UnauthorizedError from './errors/UnauthorizedError'
+const APIError = require('./errors/APIError')
+const BadGatewayError = require('./errors/BadGatewayError')
+const BadRequestError = require('./errors/BadRequestError')
+const ForbiddenError = require('./errors/ForbiddenError')
+const GatewayTimeoutError = require('./errors/GatewayTimeoutError')
+const InternalServerError = require('./errors/InternalServerError')
+const NotAcceptableError = require('./errors/NotAcceptableError')
+const NotFoundError = require('./errors/NotFoundError')
+const NotImplementedError = require('./errors/NotImplementedError')
+const RequestTimeoutError = require('./errors/RequestTimeoutError')
+const ServiceUnavailableError = require('./errors/ServiceUnavailableError')
+const UnauthorizedError = require('./errors/UnauthorizedError')
 
 const CoreIO = {
   logLevel: process.env.NODE_ENV === 'test' ? 'error' : 'sys',

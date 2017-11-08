@@ -1,4 +1,4 @@
-import path from 'path'
+const path = require('path')
 
 /**
  * Router module
@@ -19,7 +19,7 @@ import path from 'path'
 
 const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete'];
 
-export default function Router(CoreIO) {
+function Router(CoreIO) {
   let log = require('logtopus').getLogger('coreio');
 
   class Router {
@@ -223,3 +223,5 @@ export default function Router(CoreIO) {
 
   return Router;
 }
+
+module.exports = Router
