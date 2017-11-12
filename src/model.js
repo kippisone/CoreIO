@@ -63,6 +63,14 @@ module.exports = function(CoreIO) {
      */
     this.lastValidationError = null;
 
+    /**
+     * Indicates a model instance
+     *
+     * @type {Boolean}
+     * @readonly
+     */
+    this.isModel = true
+
     //-- Initial conf mapping
     if (conf === undefined) {
       conf = {};
@@ -965,7 +973,7 @@ module.exports = function(CoreIO) {
         failed = this.__registeredValidations[schemaType].call(this, value, schema);
       }
       else {
-        throw new Error('Undefined schema type', schema);
+        throw new Error('Undefined schema type! ' + schema.type);
       }
     }
 

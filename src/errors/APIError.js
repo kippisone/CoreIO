@@ -12,6 +12,14 @@ class APIError extends Error {
   constructor (message, error) {
     super(message)
     this.status = 500
+    if (error instanceof Error) {
+      this.stack = error.stack
+      this.message = error.message
+      this.fileName  = error.fileName
+      this.lineNumber = error.lineNumber
+      this.columnNumber = error.columnNumber
+    }
+
     this.error = error
     this.level = 1
   }
@@ -38,7 +46,7 @@ class APIError extends Error {
 
   toString (level) {
     level = level || this.level
-    
+
     let err = `${this.status} ${this.message}`
 
     if (level >= 2) {

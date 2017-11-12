@@ -15,8 +15,21 @@ class Route {
   getConditionFunc () {
     return (req, res) => {
       if (req.method !== this.method) return false
-      return this.reg.test(req.path)
+      if (!this.reg.test(req.path)) return false
+      req.route = this.route
+      req.params = this.processParams(req)
+      return true
     }
+  }
+
+  processParams (req) {
+    const params = this.reg.exec(req.path)
+    const parsedParams = {}
+    this.keys.forEach((key, index) => {
+      parsedParams[key.name] = params[index + 1]
+    })
+
+    return parsedParams
   }
 }
 

@@ -282,7 +282,8 @@ describe('Server', () => {
         accepts: () => true
       }, {
         status() {},
-        send() {}
+        send() {},
+        json() {}
       }).then(() => {
         inspect(fn2).wasCalledOnce()
       })

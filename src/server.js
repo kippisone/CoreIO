@@ -9,6 +9,8 @@ const Bucketchain = require('superchain/src/Bucketchain')
 const pathToRegexp = require('path-to-regexp')
 
 const Route = require('./utils/Route')
+const APIError = require('./errors/APIError')
+const InternalServerError = require('./errors/InternalServerError')
 const NotFoundError = require('./errors/NotFoundError')
 
 function ServerFactory(CoreIO) {
@@ -21,6 +23,8 @@ function ServerFactory(CoreIO) {
       this.port = conf.port || CoreIO.httpPort;
       this.host = conf.host || CoreIO.httpHost;
       this.errorLevel = conf.errorLevel || CoreIO.errorLevel
+      this.prettyPrint = conf.prettyPrint || CoreIO.prettyPrint
+      this.showParseTime = conf.showParseTime || CoreIO.showParseTime
       this.conf = conf
 
       const portNumber = `${this.port}`
@@ -29,6 +33,7 @@ function ServerFactory(CoreIO) {
         return CoreIO.__registeredServers.get(portNumber)
       } else {
         this.app = express();
+        this.app.set('x-powered-by', false)
         this.__routes = new Map()
         CoreIO.__registeredServers.set(portNumber, this)
 
@@ -86,11 +91,19 @@ function ServerFactory(CoreIO) {
     setDefaultRoutes () {
       this.errorBucket.final(function finalErrorHandler (err, req, res, next) {
         // call final err
-        err.level = this.errorLevel
-        res.status(err.status || 500)
-        req.accepts('json') && typeof err.toJSON === 'function'
-          ? res.json(err.toJSON())
-          : res.send(err.toString())
+        let apiError
+        if (err instanceof APIError) {
+          apiError = err
+        } else {
+          apiError = new InternalServerError(err.message)
+          apiError
+        }
+
+        apiError.level = this.errorLevel
+        res.status(apiError.status || 500)
+        req.accepts('json') && typeof apiError.toJSON === 'function'
+          ? res.json(apiError.toJSON())
+          : res.send(apiError.toString())
 
         next()
       }.bind(this))
@@ -99,6 +112,15 @@ function ServerFactory(CoreIO) {
         throw new NotFoundError(`Page ${req.path} was not found`)
         // return Promise.reject(new NotFoundError(`Page ${req.path} was not found`))
       }.bind(this))
+
+      if (this.showParseTime) {
+        this.use(async function requestTime (req, res, next) {
+          const time = Date.now()
+          await next()
+          const responseTime = Date.now() - time
+          res.set('Response-Time', responseTime + 'ms')
+        })
+      }
     }
 
     /**
