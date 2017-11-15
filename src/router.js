@@ -103,7 +103,9 @@ function Router(CoreIO) {
               }
 
               const model = new Model()
-              const data = await model.fetch(req.params.id)
+              const data = await model.fetch({
+                id: req.params.id
+              })
               return data
             }
           })
