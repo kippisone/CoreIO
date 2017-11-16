@@ -685,7 +685,7 @@ module.exports = function(CoreIO) {
     if (this.__service) {
       log.info('Fetch data from list service');
       let args = Array.prototype.slice.call(arguments);
-      return this.__service.find.apply(this.__service, args).then(data => {
+      return this.__service.find(...args).then(data => {
         this.push(data, {
           noAutoSave: true
         });

@@ -193,9 +193,11 @@ module.exports = function(CoreIO) {
   };
 
   /**
-   * Deletes model data
+   * Service promise
    *
-   * @method delete
+   * It resolves as soon as service has been connected
+   *
+   * @method then
    *
    * @overwritable
    * @return {object} Returns a promise
