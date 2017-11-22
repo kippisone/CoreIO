@@ -20,7 +20,7 @@
     "lagoon-reporter": "0.3.4",
     "mocha": "4.0.1",
     "sinon": "4.1.2",
-    "testberry": "0.1.1"
+    "testberry": "0.2.0"
   },
   "dependencies": {
     "body-parser": "1.18.2",
@@ -31,6 +31,6 @@
     "logtopus": "1.0.1",
     "path-to-regexp": "2.1.0",
     "sockjs": "0.3.19",
-    "superchain": "2.3.1"
+    "superchain": "2.3.2"
   }
 }
