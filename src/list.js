@@ -132,7 +132,7 @@ module.exports = function(CoreIO) {
         name: this.collection || this.table || this.shortName
       };
 
-      let Service = this.service;
+      let Service = this.service(CoreIO);
       this.__service = new Service(serviceConf);
       log.info('Connect list with service', serviceConf.name);
       this.__service.then(() => {

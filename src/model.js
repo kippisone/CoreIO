@@ -123,11 +123,11 @@ module.exports = function(CoreIO) {
 
     // initialize service
     if (this.service) {
-      let serviceConf = {
+      let serviceConf = Object.assign({
         name: this.collection || this.table || this.shortName
-      };
+      }, CoreIO.getConf(this.service.CONF_KEY));
 
-      let Service = this.service;
+      const Service = this.service(CoreIO);
       this.__service = new Service(serviceConf);
       log.info('Connect model with service', serviceConf.name);
       this.__service.then(() => {
@@ -1306,6 +1306,22 @@ module.exports = function(CoreIO) {
     }
 
     return this.__service.delete(this.get('id'));
+  };
+
+  /**
+   * Deletes **all** models from storage
+   *
+   * @method deleteAll
+   *
+   * @overwritable
+   * @return {object} Returns a promise
+   */
+  Model.prototype.deleteAll = function() {
+    if (!this.__service) {
+      return Promise.resolve(false)
+    }
+
+    return this.__service.deleteAll();
   };
 
   /**
