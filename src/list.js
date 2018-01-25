@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * CoreIO List
  *
@@ -27,8 +25,8 @@
  * });
  *
  */
-module.exports = function(CoreIO) {
-  let log = require('logtopus').getLogger('coreio');
+module.exports = function (CoreIO) {
+  let log = require('logtopus').getLogger('coreio')
 
   /**
    * CoreIO.List base class
@@ -41,15 +39,15 @@ module.exports = function(CoreIO) {
    *
    * @param {Object} conf List extend object
    */
-  var List = function(name, conf) {
-    //Call Event constructor
-    CoreIO.Event.call(this);
+  var List = function (name, conf) {
+    // Call Event constructor
+    CoreIO.Event.call(this)
 
-    var self = this;
+    var self = this
 
     if (typeof arguments[0] === 'object') {
-      conf = name;
-      name = conf.name;
+      conf = name
+      name = conf.name
     }
 
     /**
@@ -57,7 +55,7 @@ module.exports = function(CoreIO) {
      * @public
      * @type {Boolean}
      */
-    this.debug = CoreIO.debug;
+    this.debug = CoreIO.debug
 
     /**
      * Identifies class as a list instance
@@ -67,52 +65,51 @@ module.exports = function(CoreIO) {
     this.isList = true
 
     if (conf === undefined) {
-      conf = {};
+      conf = {}
     }
 
-    this.__unfiltered = {};
+    this.__unfiltered = {}
 
     /**
      * List name
      * @property {String} name
      */
-    this.name = (name ? name.replace(/List$/, '') : 'Nameless') + 'List';
+    this.name = (name ? name.replace(/List$/, '') : 'Nameless') + 'List'
 
     /**
      * Model short name
      * @property {String} name
      */
-    this.shortName = name;
+    this.shortName = name
 
     /**
      * Contains list items
      * @property {Array} items
      */
-    this.items = [];
+    this.items = []
 
     /**
      * Sets a maxlength of items
      * @property {Number} maxlength
      * @default null
      */
-    this.maxLength = null;
+    this.maxLength = null
 
     /**
      * Sets the Model to be used to create new models in push and unshift methods.
      * @property {Object} model
      */
     if (!this.model) {
-      this.model = CoreIO.Model;
+      this.model = CoreIO.Model
     }
 
     /*!
      * Mapping of initial conf
      */
     if (typeof conf === 'function') {
-      conf.call(this, self);
-    }
-    else {
-      Object.assign(this, conf);
+      conf.call(this, self)
+    } else {
+      Object.assign(this, conf)
     }
 
     /**
@@ -123,33 +120,31 @@ module.exports = function(CoreIO) {
       this.push(this.defaults, {
         silent: true,
         noValidation: true
-      });
+      })
     }
 
     // initialize service
     if (this.service) {
-      let serviceConf = {
-        name: this.collection || this.table || this.shortName
-      };
+      const serviceConf = CoreIO.getConf(this.serviceConfKey || this.service.CONF_KEY)
+      serviceConf.name = this.collection || this.table || this.shortName
 
-      let Service = this.service(CoreIO);
-      this.__service = new Service(serviceConf);
-      log.info('Connect list with service', serviceConf.name);
+      const Service = this.service(CoreIO)
+      this.__service = new Service(serviceConf)
+      log.info('Connect list with service', serviceConf.name)
       this.__service.then(() => {
-        log.sys('... service succesfully connected!');
+        log.sys('... service succesfully connected!')
         if (this.autoSave) {
-          this.fetch();
+          this.fetch()
         }
       }).catch(err => {
-        log.error('... service connection failed!', err);
-      });
-
+        log.error('... service connection failed!', err)
+      })
     }
 
-    this.state('ready');
-  };
+    this.state('ready')
+  }
 
-  Object.assign(List.prototype, CoreIO.Event.prototype);
+  Object.assign(List.prototype, CoreIO.Event.prototype)
 
   /**
    * Inherits a list prototype
@@ -158,24 +153,24 @@ module.exports = function(CoreIO) {
    * @param  {Object} options Model properties
    * @return {Object}         Returns a CoreIO.Model prototype
    */
-  List.inherit = function(name, options) {
+  List.inherit = function (name, options) {
     if (typeof name === 'object') {
-      options = name;
-      name = undefined;
+      options = name
+      name = undefined
     }
 
-    var Proto = function(listData) {
-      CoreIO.List.call(this, name, options);
+    var Proto = function (listData) {
+      CoreIO.List.call(this, name, options)
 
       if (listData) {
         this.push(listData)
       }
-    };
+    }
 
-    Proto.prototype = Object.create(CoreIO.List.prototype);
-    Proto.prototype.constructor = Proto;
-    return Proto;
-  };
+    Proto.prototype = Object.create(CoreIO.List.prototype)
+    Proto.prototype.constructor = Proto
+    return Proto
+  }
 
   /**
    * Contains the length of the list
@@ -183,10 +178,10 @@ module.exports = function(CoreIO) {
    * @type {Number}
    */
   Object.defineProperty(List.prototype, 'length', {
-    get: function() {
-      return this.items.length;
+    get: function () {
+      return this.items.length
     }
-  });
+  })
 
   /**
    * Change the list state
@@ -194,20 +189,20 @@ module.exports = function(CoreIO) {
    * @method state
    * @param {String} state New state
    */
-  List.prototype.state = function(state) {
-    this.__state = state;
-    this.emit('state.' + state);
-    this.emit('state.change', state);
-  };
+  List.prototype.state = function (state) {
+    this.__state = state
+    this.emit('state.' + state)
+    this.emit('state.change', state)
+  }
 
   /**
    * Get the current list state
    *
    * @method getState
    */
-  List.prototype.getState = function() {
-    return this.__state;
-  };
+  List.prototype.getState = function () {
+    return this.__state
+  }
 
   /**
    * Adds one ore more items to the end of a list.
@@ -224,61 +219,59 @@ module.exports = function(CoreIO) {
    *
    * @returns {Boolean} Returns true if validation was succesfully and all items were added
    */
-  List.prototype.push = function(data, options) {
+  List.prototype.push = function (data, options) {
     var models = [],
       model,
-      item;
+      item
 
-    options = options || {};
+    options = options || {}
 
     if (!Array.isArray(data)) {
-      data = [data];
+      data = [data]
     }
 
     for (var i = 0, len = data.length; i < len; i++) {
-      item = data[i];
+      item = data[i]
 
       if (item instanceof CoreIO.Model) {
-        model = item;
-      }
-      else {
-        model = new this.model('ListItem');
+        model = item
+      } else {
+        model = new this.model('ListItem')
         model.set(item, {
           noSync: true,
           silent: true
-        });
+        })
       }
 
       if (model.isValid()) {
-        models.push(model);
-      }
-      else {
-        return false;
+        models.push(model)
+      } else {
+        return false
       }
     }
 
-    //No validation error has been ocured.
-    var length = this.items.push.apply(this.items, models);
+    // No validation error has been ocured.
+    var length = this.items.push.apply(this.items, models)
 
     if (length) {
       if (this.maxLength && this.items.length > this.maxLength) {
-        this.items.splice(0, this.items.length - this.maxLength);
+        this.items.splice(0, this.items.length - this.maxLength)
       }
 
-      let data = models.map(model => model.toJSON());
+      let data = models.map(model => model.toJSON())
       if (!options.silent) {
-        this.emit('item.push', data, length);
+        this.emit('item.push', data, length)
       }
 
       if (!options.noSync) {
         if (typeof this.sync === 'function') {
-          this.sync('push', data);
+          this.sync('push', data)
         }
       }
     }
 
-    return Promise.resolve();
-  };
+    return Promise.resolve()
+  }
 
   /**
    * Adds one ore more items to the beginning of a list.
@@ -294,60 +287,58 @@ module.exports = function(CoreIO) {
    * }
    * @returns {Boolean} Returns true if validation was succesfully and all items were added
    */
-  List.prototype.unshift = function(data, options) {
+  List.prototype.unshift = function (data, options) {
     var models = [],
       model,
-      item;
+      item
 
-    options = options || {};
+    options = options || {}
 
     if (!Array.isArray(data)) {
-      data = [data];
+      data = [data]
     }
 
     for (var i = 0, len = data.length; i < len; i++) {
-      item = data[i];
+      item = data[i]
 
       if (item instanceof CoreIO.Model) {
-        model = item;
-      }
-      else {
-        model = new this.model('ListItem');
+        model = item
+      } else {
+        model = new this.model('ListItem')
         model.set(item, {
           noSync: true,
           silent: true
-        });
+        })
       }
 
       if (model.isValid()) {
-        models.unshift(model);
-      }
-      else {
-        return false;
+        models.unshift(model)
+      } else {
+        return false
       }
     }
 
-    //No validation error has been ocured.
-    var length = this.items.unshift.apply(this.items, models);
+    // No validation error has been ocured.
+    var length = this.items.unshift.apply(this.items, models)
 
     if (length) {
       if (this.maxLength && this.items.length > this.maxLength) {
-        this.items.splice(this.maxLength);
+        this.items.splice(this.maxLength)
       }
 
       if (!options.silent) {
-        this.emit('item.unshift', models, length);
+        this.emit('item.unshift', models, length)
       }
 
       if (!options.noSync) {
         if (typeof this.sync === 'function') {
-          this.sync('unshift', models);
+          this.sync('unshift', models)
         }
       }
     }
 
-    return true;
-  };
+    return true
+  }
 
   /**
    * Removes the last item from a list and returns it.
@@ -362,28 +353,28 @@ module.exports = function(CoreIO) {
    *
    * @returns {Object} Returns the removed item
    */
-  List.prototype.pop = function(options) {
-    var model;
+  List.prototype.pop = function (options) {
+    var model
 
-    options = options || {};
+    options = options || {}
 
-    model = this.items.pop() || null;
+    model = this.items.pop() || null
     if (model === undefined) {
-      return null;
+      return null
     }
 
     if (!options.silent) {
-      this.emit('item.pop', model);
+      this.emit('item.pop', model)
     }
 
     if (!options.noSync) {
       if (typeof this.sync === 'function') {
-        this.sync('pop', model);
+        this.sync('pop', model)
       }
     }
 
-    return model;
-  };
+    return model
+  }
 
   /**
    * Removes the first item from a list and returns it.
@@ -398,28 +389,28 @@ module.exports = function(CoreIO) {
    *
    * @returns {Object} Returns the removed item
    */
-  List.prototype.shift = function(options) {
-    var model;
+  List.prototype.shift = function (options) {
+    var model
 
-    options = options || {};
+    options = options || {}
 
-    model = this.items.shift() || null;
+    model = this.items.shift() || null
     if (model === undefined) {
-      return null;
+      return null
     }
 
     if (!options.silent) {
-      this.emit('item.shift', model);
+      this.emit('item.shift', model)
     }
 
     if (!options.noSync) {
       if (typeof this.sync === 'function') {
-        this.sync('shift', model);
+        this.sync('shift', model)
       }
     }
 
-    return model;
-  };
+    return model
+  }
 
   /**
    * Updates a list item or pushs it to the end
@@ -440,34 +431,32 @@ module.exports = function(CoreIO) {
    *
    * @returns {Object} Returns the updated item
    */
-  List.prototype.update = function(match, data, options) {
-    options = options || {};
+  List.prototype.update = function (match, data, options) {
+    options = options || {}
 
-    var updateItem;
+    var updateItem
     if (typeof match === 'number') {
-
-      updateItem = this.items[match];
-    }
-    else {
-      updateItem = this.findOne(match);
+      updateItem = this.items[match]
+    } else {
+      updateItem = this.findOne(match)
     }
 
     if (updateItem) {
-      updateItem.set(data, { noSync: true, silent: true });
+      updateItem.set(data, { noSync: true, silent: true })
 
       if (!options.silent) {
-        this.emit('item.update', updateItem);
+        this.emit('item.update', updateItem)
       }
 
       if (!options.noSync) {
         if (typeof this.sync === 'function') {
-          this.sync('update', match, data);
+          this.sync('update', match, data)
         }
       }
     }
 
-    return updateItem;
-  };
+    return updateItem
+  }
 
   /**
    * Removes an item at a given position
@@ -484,41 +473,40 @@ module.exports = function(CoreIO) {
    *
    * @returns {Object} Returns the removed item
    */
-  List.prototype.remove = function(match, options) {
-    options = options || {};
+  List.prototype.remove = function (match, options) {
+    options = options || {}
 
     var removedItem,
-      index = 0;
+      index = 0
     if (typeof match === 'number') {
-      removedItem = this.items[match];
-      index = match;
-    }
-    else {
-      removedItem = this.findOne(match);
+      removedItem = this.items[match]
+      index = match
+    } else {
+      removedItem = this.findOne(match)
       for (var i = 0, len = this.items.length; i < len; i++) {
         if (this.items[i] === removedItem) {
-          index = i;
-          break;
+          index = i
+          break
         }
       }
     }
 
     if (removedItem) {
-      this.items.splice(index, 1);
+      this.items.splice(index, 1)
 
       if (!options.silent) {
-        this.emit('item.remove', removedItem, index);
+        this.emit('item.remove', removedItem, index)
       }
 
       if (!options.noSync) {
         if (typeof this.sync === 'function') {
-          this.sync('remove', match, index);
+          this.sync('remove', match, index)
         }
       }
     }
 
-    return removedItem;
-  };
+    return removedItem
+  }
 
   /**
    * Clears the whole list
@@ -533,49 +521,49 @@ module.exports = function(CoreIO) {
    *
    * @returns {Number} Returns the amount of removed items
    */
-  List.prototype.clear = function(options) {
-    options = options || {};
+  List.prototype.clear = function (options) {
+    options = options || {}
 
     if (this.items.length === 0) {
-      return 0;
+      return 0
     }
 
-    var oldValue = this.toArray();
+    var oldValue = this.toArray()
 
-    this.items = [];
+    this.items = []
 
     if (!options.silent) {
-      this.emit('item.clear', oldValue);
+      this.emit('item.clear', oldValue)
     }
 
     if (!options.noSync) {
       if (typeof this.sync === 'function') {
-        this.sync('clear', oldValue);
+        this.sync('clear', oldValue)
       }
     }
 
-    return oldValue.length;
-  };
+    return oldValue.length
+  }
 
   /**
    * Returns list items as an array
    * @method toArray
    * @return {Array} Returns an array of list items
    */
-  List.prototype.toArray = function() {
-    return this.items.map(function(model) {
-      return model.properties;
-    });
-  };
+  List.prototype.toArray = function () {
+    return this.items.map(function (model) {
+      return model.properties
+    })
+  }
 
   /**
    * Compatibility, does the same as toArray()
    * @method toJSON
    * @return {Array} Returns an array of list items
    */
-  List.prototype.toJSON = function() {
-    return this.toArray();
-  };
+  List.prototype.toJSON = function () {
+    return this.toArray()
+  }
 
   /**
    * Search through list items and returns the first matching item
@@ -584,36 +572,35 @@ module.exports = function(CoreIO) {
    * @param {Object} searchfor Searching for object
    * @return {Object} Returns the first matched item or null. The returning item is a CoreIO.Model object
    */
-  List.prototype.findOne = function(query) {
-    var parent;
+  List.prototype.findOne = function (query) {
+    var parent
 
-    parent = this.items;
+    parent = this.items
 
     if (parent) {
       for (var i = 0; i < parent.length; i++) {
         var prop = parent[i],
-          matching;
+          matching
 
         for (var p in query) {
           if (query.hasOwnProperty(p)) {
             if (prop.properties[p] && prop.properties[p] === query[p]) {
-              matching = true;
-              break;
-            }
-            else {
-              matching = false;
+              matching = true
+              break
+            } else {
+              matching = false
             }
           }
         }
 
         if (matching === true) {
-          return prop;
+          return prop
         }
       }
     }
 
-    return null;
-  };
+    return null
+  }
 
   /**
    * Search through list items and returns all matching items
@@ -623,38 +610,36 @@ module.exports = function(CoreIO) {
    * @return {Object} Returns all matched item or an empty array.
    * The returning value is an array of CoreIO.Model objects
    */
-  List.prototype.find = function(query) {
+  List.prototype.find = function (query) {
     var parent,
-      res = [];
+      res = []
 
-    parent = this.items;
+    parent = this.items
 
     if (parent) {
       for (var i = 0; i < parent.length; i++) {
         var prop = parent[i],
-          matching;
+          matching
 
         for (var p in query) {
           if (query.hasOwnProperty(p)) {
             if (prop.properties[p] && prop.properties[p] === query[p]) {
-              matching = true;
-              break;
-            }
-            else {
-              matching = false;
+              matching = true
+              break
+            } else {
+              matching = false
             }
           }
         }
 
         if (matching === true) {
-          res.push(prop);
+          res.push(prop)
         }
-
       }
     }
 
-    return res;
-  };
+    return res
+  }
 
   /**
    * Calls a function on each item.
@@ -665,39 +650,39 @@ module.exports = function(CoreIO) {
    * @param  {Function} fn      Funtion to be called on each item. Gets the model as first arg and the traversing object as second arg.
    * @returns {Object}          Returns a traversed object
    */
-  List.prototype.each = function(initial, fn) {
+  List.prototype.each = function (initial, fn) {
     if (fn === undefined || fn === null) {
-      fn = initial;
-      initial = {};
+      fn = initial
+      initial = {}
     }
 
-    var data = initial;
-    var result = [];
+    var data = initial
+    var result = []
     for (var i = 0, len = this.items.length; i < len; i++) {
-      var res = fn(this.items[i], data);
-      result.push(res);
+      var res = fn(this.items[i], data)
+      result.push(res)
     }
 
-    return result;
-  };
+    return result
+  }
 
-  List.prototype.fetch = function() {
+  List.prototype.fetch = function () {
     if (this.__service) {
-      log.info('Fetch data from list service');
-      let args = Array.prototype.slice.call(arguments);
+      log.info('Fetch data from list service')
+      let args = Array.prototype.slice.call(arguments)
       return this.__service.find(...args).then(data => {
         this.push(data, {
           noAutoSave: true
-        });
+        })
 
-        return data;
-      });
+        return data
+      })
     }
 
-    return Promise.resolve(this.toArray());
+    return Promise.resolve(this.toArray())
   }
 
-  //--
+  // --
 
-  return List;
-};
+  return List
+}
