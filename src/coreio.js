@@ -23,7 +23,7 @@ const UnauthorizedError = require('./errors/UnauthorizedError')
 const CoreIO = {
 }
 
-const config = new Config({
+CoreIO.__config = new Config({
   server: {
     port: 6446,
     host: '0.0.0.0'
@@ -41,7 +41,6 @@ const config = new Config({
   }
 })
 
-CoreIO.__config = config.__config
 CoreIO.conf = {}
 
 Utils(CoreIO)
