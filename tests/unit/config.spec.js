@@ -1,7 +1,7 @@
 const inspect = require('inspect.js')
 const CoreIO = require('../../')
 
-describe.only('Config', () => {
+describe('Config', () => {
   describe('class', () => {
     it('should be a class', () => {
       inspect(CoreIO.Config).isClass()
