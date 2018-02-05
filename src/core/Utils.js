@@ -1,12 +1,5 @@
-/**
- * Extends CoreIO with some usefull functions
- *
- * @module  CoreIO.Utils
- */
-'use strict'
-
-function Utils (CoreIO) {
-  CoreIO.undotify = function (path, obj) {
+class Utils {
+  static undotify (path, obj) {
     if (path) {
       path = path.split('.')
       path.forEach(function (key) {
@@ -29,7 +22,7 @@ function Utils (CoreIO) {
    *
    * @returns {Object} Returns the extended object if obj was set otherwis a new object will be returned
    */
-  CoreIO.dedotify = function (obj, key, value) {
+  static dedotify (obj, key, value) {
     if (typeof obj === 'string') {
       value = key
       key = obj
@@ -75,7 +68,7 @@ function Utils (CoreIO) {
    * @param {Number} len (Optional) String length. Defaults to 7
    * @returns {String} Unique string
    */
-  CoreIO.uid = function (len) {
+  static uid (len) {
     len = len || 7
     var str = ''
 
@@ -112,9 +105,9 @@ function Utils (CoreIO) {
    * @param  {Function} [callback] Callback function, to be called on resolv or rejecting the promise
    * @return {Object} Returns a promise object
    */
-  CoreIO.promise = function (callback) {
+  static promise (callback) {
     var s, r
-    var promise = new CoreIO.Promise(function (resolve, reject) {
+    var promise = new Promise(function (resolve, reject) {
       s = resolve
       r = reject
     })
@@ -167,7 +160,7 @@ function Utils (CoreIO) {
     return promise
   }
 
-  CoreIO.isEmptyObject = function (obj) {
+  static isEmptyObject (obj) {
     // jshint forin: false
     var name
     for (name in obj) {
@@ -176,7 +169,7 @@ function Utils (CoreIO) {
     return true
   }
 
-  CoreIO.isFunction = function (fn) {
+  static isFunction (fn) {
     return typeof fn === 'function'
   }
 
@@ -185,12 +178,12 @@ function Utils (CoreIO) {
   * @param  {Object|Array}  obj Object which should be checked
   * @return {Boolean}     Returns true if obj is empty
   */
-  CoreIO.isEmpty = function (obj) {
+  static isEmpty (obj) {
     if (Array.isArray(obj)) {
       return obj.length === 0
     }
 
-    return CoreIO.isEmptyObj(obj)
+    return Utils.isEmptyObj(obj)
   }
 }
 

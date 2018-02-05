@@ -15,9 +15,9 @@ const path = require('path')
  * })
  */
 
-'use strict';
+'use strict'
 
-const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete'];
+const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete']
 
 const ALLOW_BITMAP = {
   READ: 1,
@@ -29,21 +29,21 @@ const ALLOW_BITMAP = {
   CRUD: 31
 }
 
-function Router(CoreIO) {
-  let log = require('logtopus').getLogger('coreio');
+function Router (CoreIO) {
+  let log = require('logtopus').getLogger('coreio')
 
   class Router {
-    constructor(conf) {
-      conf = conf || {};
+    constructor (conf) {
+      conf = conf || {}
 
       const server = new CoreIO.Server({
-        port: CoreIO.getConf('httpPort'),
-        host: CoreIO.getConf('httpHost'),
+        port: CoreIO.getConfig('server.port'),
+        host: CoreIO.getConfig('server.host'),
         noServer: conf.noServer
-      });
+      })
 
-      this.server = server;
-      this.app = server.app;
+      this.server = server
+      this.app = server.app
       this.mount = this.validatePath(conf.mount, '')
       this.prettyPrint = server.prettyPrint
 
@@ -52,17 +52,17 @@ function Router(CoreIO) {
       }
 
       if (conf.slug) {
-        this.registerRoutes(conf);
+        this.registerRoutes(conf)
       }
     }
 
-    registerRoutes(conf) {
+    registerRoutes (conf) {
       conf.allow = conf.allow || ['READ']
 
       if (conf.model || conf.list) {
-        conf = this.createConfig(conf);
+        conf = this.createConfig(conf)
       } else {
-        conf = [conf];
+        conf = [conf]
       }
 
       for (const c of conf) {
@@ -70,25 +70,25 @@ function Router(CoreIO) {
           for (const method of HTTP_METHODS) {
             if (c[method]) {
               const slug = path.join(this.mount, c.slug)
-              log.sys(`Register route ${method.toUpperCase()} ${slug}`);
+              log.sys(`Register route ${method.toUpperCase()} ${slug}`)
               this.server.route(method.toUpperCase(), slug, this.requestHandler(c[method]))
             }
           }
         }
       }
 
-      return this;
+      return this
     }
 
-    registerHTMLPage(slug, view, data) {
-      const app = this.app;
-      app.get(slug, function(req, res) {
-        res.render(view, data);
-      });
+    registerHTMLPage (slug, view, data) {
+      const app = this.app
+      app.get(slug, function (req, res) {
+        res.render(view, data)
+      })
     }
 
-    createConfig(conf) {
-      const newConf = [];
+    createConfig (conf) {
+      const newConf = []
       const slug = conf.slug.replace(/\/$/, '')
       const allow = this.getBitmap(ALLOW_BITMAP, conf.allow)
 
@@ -114,71 +114,71 @@ function Router(CoreIO) {
         if (ALLOW_BITMAP.CREATE & allow) {
           newConf.push({
             slug: slug,
-            async post(req, res) {
-              const model = new Model();
-              await model.set(req.body);
-              return model.save();
+            async post (req, res) {
+              const model = new Model()
+              await model.set(req.body)
+              return model.save()
             }
-          });
+          })
         }
 
         if (ALLOW_BITMAP.REPLACE & allow) {
           newConf.push({
             slug: slug + '/:id',
-            async put(req, res) {
-              const model = new Model();
-              const id = model.get('id');
+            async put (req, res) {
+              const model = new Model()
+              const id = model.get('id')
               model.replace(req.body)
-              model.set('id', id);
-              return model.save();
+              model.set('id', id)
+              return model.save()
             }
-          });
+          })
         }
 
         if (ALLOW_BITMAP.CHANGE & allow) {
           newConf.push({
             slug: slug + '/:id',
-            async patch(req, res) {
-              const model = new Model();
-              model.set(req.body);
-              return model.save();
+            async patch (req, res) {
+              const model = new Model()
+              model.set(req.body)
+              return model.save()
             }
-          });
+          })
         }
 
         if (ALLOW_BITMAP.DELETE & allow) {
           newConf.push({
             slug: slug + '/:id',
-            delete(req, res) {
-              const model = new Model();
-              return model.delete(req.params.id);
+            delete (req, res) {
+              const model = new Model()
+              return model.delete(req.params.id)
             }
-          });
+          })
         }
       }
 
       if (conf.list) {
-        const List = conf.list;
+        const List = conf.list
         if (ALLOW_BITMAP.READ & allow) {
           newConf.push({
             slug: slug,
-            async get(req, res) {
+            async get (req, res) {
               if (List.isList) {
                 return List.toArray()
               }
 
-              const list = new List();
+              const list = new List()
               await list.fetch()
-              return list.toArray();
+              return list.toArray()
             }
-          });
+          })
         }
       }
 
-      return newConf;
+      return newConf
     }
 
-    requestHandler(fn) {
+    requestHandler (fn) {
       return async function (...args) {
         const req = args[0]
         const res = args[1]
@@ -195,7 +195,7 @@ function Router(CoreIO) {
 
         if (typeof p.then === 'function' && typeof p.catch === 'function') {
           const data = await p
-          res.status(200);
+          res.status(200)
           this.sendResponse(req, res, data)
         } else {
           res.status(200)
@@ -204,7 +204,7 @@ function Router(CoreIO) {
       }.bind(this)
     }
 
-    sendResponse(req, res, data) {
+    sendResponse (req, res, data) {
       if (typeof data === 'object' && req.accepts('json')) {
         data = JSON.stringify(data, null, this.prettyPrint ? '  ' : '')
         res.set('Content-Type', 'application/json')
@@ -213,7 +213,7 @@ function Router(CoreIO) {
       res.send(data)
     }
 
-    removeRoute(path) {
+    removeRoute (path) {
       let i = 0
       while (true) {
         const layer = this.app._router.stack[i]
@@ -251,11 +251,11 @@ function Router(CoreIO) {
       slug = slug || defaultSlug
       if (!slug) return slug
       if (!/^\//.test(slug)) throw new Error(`Path validation failed for path '${slug}'! It has to start with a '/'`)
-      return  slug.replace(/\/+$/, '')
+      return slug.replace(/\/+$/, '')
     }
 
     getBitmap (bitmap, values) {
-      let bit = 0;
+      let bit = 0
 
       values.forEach((val) => {
         bit = bit | bitmap[val]
@@ -265,7 +265,7 @@ function Router(CoreIO) {
     }
   }
 
-  return Router;
+  return Router
 }
 
 module.exports = Router

@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /**
 * CoreIO Service
@@ -8,8 +8,8 @@
 * @package CoreIO
 * @module Service
 */
-module.exports = function(CoreIO) {
-  let log = require('logtopus').getLogger('coreio');
+module.exports = function (CoreIO) {
+  let log = require('logtopus').getLogger('coreio')
 
   /**
    * CoreIO.Service base class
@@ -22,40 +22,38 @@ module.exports = function(CoreIO) {
    *
    * @param {Object} conf Service extend object
    */
-  var Service = function CoreIOService(name, conf) {
-
+  var Service = function CoreIOService (name, conf) {
     /**
      * Enable debug mode
      * @public
      * @type {Boolean}
      */
-    log.logLevel = CoreIO.logLevel;
+    log.logLevel = CoreIO.getConfig('log.level')
 
     if (conf === undefined) {
-      conf = {};
+      conf = {}
     }
 
     if (typeof conf === 'function') {
-      conf.call(this, this);
-    }
-    else {
-      Object.assign(this, conf);
+      conf.call(this, this)
+    } else {
+      Object.assign(this, conf)
     }
 
     /**
      * Service name
      * @property {String} name
      */
-    this.name = name;
+    this.name = name
 
-    //-- Add default values
+    // -- Add default values
     if (this.defaults && !CoreIO.isEmptyObject(this.defaults)) {
       this.set(this.defaults, {
         silent: true,
         noValidation: true
-      });
+      })
     }
-  };
+  }
 
   /**
    * Inherits a service prototype
@@ -65,42 +63,40 @@ module.exports = function(CoreIO) {
    * @param  {Object} options Service properties
    * @return {Object}         Returns a CoreIO.Service prototype
    */
-  Service.inherit = function(name, options) {
+  Service.inherit = function (name, options) {
     if (typeof name === 'object') {
-      options = name;
-      name = undefined;
+      options = name
+      name = undefined
     }
 
     // call ready state constructor
-    CoreIO.ReadyState.call(this);
+    CoreIO.ReadyState.call(this)
 
-    var Proto = function(_name, _options) {
-      //TODO call this later, ready state will be set before _options had been run
-      CoreIO.Service.call(this, name, options);
+    var Proto = function (_name, _options) {
+      // TODO call this later, ready state will be set before _options had been run
+      CoreIO.Service.call(this, name, options)
 
       if (_name) {
         if (typeof _name === 'string') {
-          name = _name;
-        }
-        else {
-          _options = _name;
+          name = _name
+        } else {
+          _options = _name
         }
 
         if (typeof _options === 'function') {
-          _options.call(this, this);
-        }
-        else if (typeof _options === 'object') {
-          Object.assign(this, _options);
+          _options.call(this, this)
+        } else if (typeof _options === 'object') {
+          Object.assign(this, _options)
         }
       }
-    };
+    }
 
-    Proto.prototype = Object.create(CoreIO.Service.prototype);
-    Proto.prototype.constructor = Proto;
-    return Proto;
-  };
+    Proto.prototype = Object.create(CoreIO.Service.prototype)
+    Proto.prototype.constructor = Proto
+    return Proto
+  }
 
-  Service.prototype = Object.create(CoreIO.ReadyState.prototype);
+  Service.prototype = Object.create(CoreIO.ReadyState.prototype)
 
   /**
    * Save model data
@@ -112,12 +108,11 @@ module.exports = function(CoreIO) {
    */
   Service.prototype.save = function (data) {
     if (data.id) {
-      return this.update(data.id, data);
+      return this.update(data.id, data)
+    } else {
+      return this.insert(data)
     }
-    else {
-      return this.insert(data);
-    }
-  };
+  }
 
   /**
    * Save model data
@@ -128,8 +123,8 @@ module.exports = function(CoreIO) {
    * @return {object} Returns a promise
    */
   Service.prototype.insert = function () {
-    return Promise.resolve();
-  };
+    return Promise.resolve()
+  }
 
   /**
    * Update model data
@@ -140,8 +135,8 @@ module.exports = function(CoreIO) {
    * @return {object} Returns a promise
    */
   Service.prototype.update = function () {
-    return Promise.resolve();
-  };
+    return Promise.resolve()
+  }
 
   /**
    * Fetch model data
@@ -153,8 +148,8 @@ module.exports = function(CoreIO) {
    * @return {object} Returns a promise
    */
   Service.prototype.fetch = function () {
-    return Promise.resolve();
-  };
+    return Promise.resolve()
+  }
 
   /**
    * Find model data
@@ -165,8 +160,8 @@ module.exports = function(CoreIO) {
    * @return {object} Returns a promise
    */
   Service.prototype.find = function () {
-    return Promise.resolve();
-  };
+    return Promise.resolve()
+  }
 
   /**
    * Find one item
@@ -177,8 +172,8 @@ module.exports = function(CoreIO) {
    * @return {object} Returns a promise
    */
   Service.prototype.findOne = function () {
-    return Promise.resolve();
-  };
+    return Promise.resolve()
+  }
 
   /**
    * Deletes model data
@@ -189,8 +184,8 @@ module.exports = function(CoreIO) {
    * @return {object} Returns a promise
    */
   Service.prototype.delete = function () {
-    return Promise.resolve();
-  };
+    return Promise.resolve()
+  }
 
   /**
    * Service promise
@@ -203,10 +198,10 @@ module.exports = function(CoreIO) {
    * @return {object} Returns a promise
    */
   Service.prototype.then = function (fn) {
-    return new Promise(resolve => resolve()).then(fn);
-  };
+    return new Promise(resolve => resolve()).then(fn)
+  }
 
-  //--
+  // --
 
-  return Service;
-};
+  return Service
+}

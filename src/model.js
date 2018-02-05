@@ -44,7 +44,7 @@ module.exports = (CoreIO) => {
      * @public
      * @type {Boolean}
      */
-    log.logLevel = CoreIO.logLevel
+    log.logLevel = CoreIO.getConfig('log.level')
 
     /**
      * Stores models properties

@@ -1,10 +1,11 @@
-'use strict';
+'use strict'
 
 const Utils = require('./utils')
 const Socket = require('./socket')
 const Service = require('./service')
 const Server = require('./server')
 const Router = require('./router')
+const Config = require('./core/Config')
 
 const APIError = require('./errors/APIError')
 const BadGatewayError = require('./errors/BadGatewayError')
@@ -20,29 +21,43 @@ const ServiceUnavailableError = require('./errors/ServiceUnavailableError')
 const UnauthorizedError = require('./errors/UnauthorizedError')
 
 const CoreIO = {
-  logLevel: process.env.NODE_ENV === 'test' ? 'error' : 'sys',
-  socketPort: 9889,
-  socketHost: '0.0.0.0',
-  httpPort: 6446,
-  httpHost: '0.0.0.0',
-  errorLevel: 1
-};
+}
 
-CoreIO.conf = {};
+const config = new Config({
+  server: {
+    port: 6446,
+    host: '0.0.0.0'
+  },
+  log: {
+    level: process.env.NODE_ENV === 'test' ? 'error' : 'sys'
 
-Utils(CoreIO);
-CoreIO.Event = require('./event')(CoreIO);
-CoreIO.List = require('./list')(CoreIO);
-CoreIO.Model = require('./model')(CoreIO);
-CoreIO.ReadyState = require('./readystate')(CoreIO);
-CoreIO.Service = require('./service')(CoreIO);
-CoreIO.SyncList = require('./synclist')(CoreIO);
-CoreIO.SyncModel = require('./syncmodel')(CoreIO);
+  },
+  error: {
+    level: 1
+  },
+  socket: {
+    port: 9889,
+    host: '0.0.0.0'
+  }
+})
 
-CoreIO.Service = Service(CoreIO);
-CoreIO.Server = Server(CoreIO);
-CoreIO.Socket = Socket(CoreIO);
-CoreIO.Router = Router(CoreIO);
+CoreIO.__config = config.__config
+CoreIO.conf = {}
+
+Utils(CoreIO)
+CoreIO.Event = require('./event')(CoreIO)
+CoreIO.List = require('./list')(CoreIO)
+CoreIO.Model = require('./model')(CoreIO)
+CoreIO.ReadyState = require('./readystate')(CoreIO)
+CoreIO.Service = require('./service')(CoreIO)
+CoreIO.SyncList = require('./synclist')(CoreIO)
+CoreIO.SyncModel = require('./syncmodel')(CoreIO)
+
+CoreIO.Config = Config
+CoreIO.Service = Service(CoreIO)
+CoreIO.Server = Server(CoreIO)
+CoreIO.Socket = Socket(CoreIO)
+CoreIO.Router = Router(CoreIO)
 
 CoreIO.APIError = APIError
 CoreIO.BadGatewayError = BadGatewayError
@@ -57,7 +72,7 @@ CoreIO.RequestTimeoutError = RequestTimeoutError
 CoreIO.ServiceUnavailableError = ServiceUnavailableError
 CoreIO.UnauthorizedError = UnauthorizedError
 
-CoreIO.CoreEvents = new CoreIO.Event();
+CoreIO.CoreEvents = new CoreIO.Event()
 
 /**
  * Creates a model class
@@ -69,9 +84,9 @@ CoreIO.CoreEvents = new CoreIO.Event();
  * @param  {object} opts Model options
  * @returns {object} Returns a model class
  */
-CoreIO.createModel = function(name, opts) {
-  return CoreIO.Model.inherit(name, opts);
-};
+CoreIO.createModel = function (name, opts) {
+  return CoreIO.Model.inherit(name, opts)
+}
 
 /**
  * Creates a list class
@@ -83,9 +98,9 @@ CoreIO.createModel = function(name, opts) {
  * @param  {object} opts List options
  * @returns {object} Returns a list class
  */
-CoreIO.createList = function(name, opts) {
-  return CoreIO.List.inherit(name, opts);
-};
+CoreIO.createList = function (name, opts) {
+  return CoreIO.List.inherit(name, opts)
+}
 
 /**
  * Creates a syncmodel class
@@ -97,9 +112,9 @@ CoreIO.createList = function(name, opts) {
  * @param  {object} opts SyncModel options
  * @returns {object} Returns a syncmodel class
  */
-CoreIO.createSyncModel = function(name, opts) {
-  return CoreIO.SyncModel.inherit(name, opts);
-};
+CoreIO.createSyncModel = function (name, opts) {
+  return CoreIO.SyncModel.inherit(name, opts)
+}
 
 /**
  * Creates a synclist class
@@ -111,9 +126,9 @@ CoreIO.createSyncModel = function(name, opts) {
  * @param  {object} opts SyncList options
  * @returns {object} Returns a model class
  */
-CoreIO.createSyncList = function(name, opts) {
-  return CoreIO.SyncList.inherit(name, opts);
-};
+CoreIO.createSyncList = function (name, opts) {
+  return CoreIO.SyncList.inherit(name, opts)
+}
 
 /**
  * Creates a service class
@@ -125,14 +140,14 @@ CoreIO.createSyncList = function(name, opts) {
  * @param  {object} opts Service options
  * @returns {object} Returns a service class
  */
-CoreIO.createService = function(name, opts) {
-  return CoreIO.Service.inherit(name, opts);
-};
+CoreIO.createService = function (name, opts) {
+  return CoreIO.Service.inherit(name, opts)
+}
 
-CoreIO.createRouter = function(slug) {
-  let router = require('express').Router();
-  return router;
-};
+CoreIO.createRouter = function (slug) {
+  let router = require('express').Router()
+  return router
+}
 
 /**
  * Register a API route
@@ -144,46 +159,46 @@ CoreIO.createRouter = function(slug) {
  *
  * @return {object} Returns a router instance
  */
-CoreIO.api = function(slug, conf) {
-  conf.slug = slug;
+CoreIO.api = function (slug, conf) {
+  conf.slug = slug
   let router = new CoreIO.Router({
     noServer: conf.noServer || false
-  });
+  })
 
-  router.registerRoutes(conf);
+  router.registerRoutes(conf)
 
-  return router;
+  return router
 }
 
-CoreIO.getHttpServer = function(host, port) {
+CoreIO.getHttpServer = function (host, port) {
   if (!host) {
-    host = CoreIO.httpHost;
+    host = CoreIO.getConfig('server.host')
   }
 
   if (!port) {
-    port = CoreIO.httpPort;
+    port = CoreIO.getConfig('server.port')
   }
 
   if (!CoreIO.__httpServers) {
-    CoreIO.__httpServers = {};
+    CoreIO.__httpServers = {}
   }
 
   if (CoreIO.__httpServers[host + ':' + port]) {
-    return CoreIO.__httpServers[host + ':' + port];
+    return CoreIO.__httpServers[host + ':' + port]
   }
 
-  let http = require('http');
-  let server = http.createServer();
-  server.listen(port, host);
-  return server;
+  let http = require('http')
+  let server = http.createServer()
+  server.listen(port, host)
+  return server
 }
 
-CoreIO.getConf = function(name, defaultValue) {
-  return CoreIO.conf[name] || defaultValue;
+CoreIO.getConfig = function (name, defaultValue) {
+  return CoreIO.__config.getConfig(name, defaultValue)
 }
 
-CoreIO.setConf = function(name, value) {
-  CoreIO.conf[name] = value;
+CoreIO.setConfig = function (name, value) {
+  return CoreIO.__config.setConfig(name, value)
 }
 
 /**
@@ -202,19 +217,19 @@ CoreIO.setConf = function(name, value) {
  * @param  {object} conf  Router configuration
  * @return {object}       Returns a Router instance
  */
-CoreIO.htmlPage = function(route, data, conf) {
-  conf = conf || {};
+CoreIO.htmlPage = function (route, data, conf) {
+  conf = conf || {}
   let router = new CoreIO.Router({
     noServer: conf.noServer || false
-  });
+  })
 
   router.registerHTMLPage(route, 'html', Object.assign({
     title: 'CoreIO html page',
     scripts: [],
     styles: []
-  }, data));
-  return router;
-};
+  }, data))
+  return router
+}
 
 /**
  * Register a static dir
@@ -222,14 +237,14 @@ CoreIO.htmlPage = function(route, data, conf) {
  * @param  {object} conf Router configuration
  * @return {object}      Returns a Router object
  */
-CoreIO.staticDir = function(dir) {
+CoreIO.staticDir = function (dir) {
   const server = new CoreIO.Server({
-    port: CoreIO.getConf('httpPort'),
-    host: CoreIO.getConf('httpHost')
-  });
+    port: CoreIO.getConfig('server.port'),
+    host: CoreIO.getConfig('server.host')
+  })
 
-  server.registerStaticDir(dir);
-  return server;
+  server.registerStaticDir(dir)
+  return server
 }
 
-module.exports = CoreIO;
+module.exports = CoreIO
