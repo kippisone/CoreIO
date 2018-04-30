@@ -13,16 +13,16 @@ const APIError = require('./errors/APIError')
 const InternalServerError = require('./errors/InternalServerError')
 const NotFoundError = require('./errors/NotFoundError')
 
-function ServerFactory(CoreIO) {
-  let log = require('logtopus').getLogger('coreio');
-  CoreIO.__registeredServers = new Map();
+function ServerFactory (CoreIO) {
+  let log = require('logtopus').getLogger('coreio')
+  CoreIO.__registeredServers = new Map()
 
   class Server {
-    constructor(conf) {
+    constructor (conf) {
       conf = conf || {}
-      this.port = conf.port || CoreIO.httpPort;
-      this.host = conf.host || CoreIO.httpHost;
-      this.errorLevel = conf.errorLevel || CoreIO.errorLevel
+      this.port = conf.port || CoreIO.getConfig('server.port')
+      this.host = conf.host || CoreIO.getConfig('server.host')
+      this.errorLevel = conf.errorLevel || CoreIO.getConfig('error.level')
       this.prettyPrint = conf.prettyPrint || CoreIO.prettyPrint
       this.showParseTime = conf.showParseTime || CoreIO.showParseTime
       this.conf = conf
@@ -32,24 +32,24 @@ function ServerFactory(CoreIO) {
       if (CoreIO.__registeredServers.has(portNumber)) {
         return CoreIO.__registeredServers.get(portNumber)
       } else {
-        this.app = express();
+        this.app = express()
         this.app.set('x-powered-by', false)
         this.__routes = new Map()
         CoreIO.__registeredServers.set(portNumber, this)
 
         this.connect({
           noServer: conf.noServer
-        });
+        })
       }
     }
 
-    connect(options) {
+    connect (options) {
       options = options || {}
       const app = this.app
       app.use(cors(this.getCorsOoptions()))
       app.use(bodyParser.json())
       app.use(logtopus.express({
-        logLevel: CoreIO.logLevel
+        logLevel: CoreIO.getConfig('log.level')
       }))
 
       app.engine('.fire', firetpl.__express)
@@ -85,7 +85,7 @@ function ServerFactory(CoreIO) {
        * @event server:init
        * @arg {obj} instance The fresh created CoreIO.Server instance
        */
-      CoreIO.CoreEvents.emit('server:init', this);
+      CoreIO.CoreEvents.emit('server:init', this)
     }
 
     setDefaultRoutes () {
@@ -111,7 +111,7 @@ function ServerFactory(CoreIO) {
       this.presendBucket.final(function notFoundHandler (req, res, next) {
         throw new NotFoundError(`Page ${req.path} was not found`)
         // return Promise.reject(new NotFoundError(`Page ${req.path} was not found`))
-      }.bind(this))
+      })
 
       if (this.showParseTime) {
         this.use(async function requestTime (req, res, next) {
@@ -136,7 +136,7 @@ function ServerFactory(CoreIO) {
     }
 
     removeAllRoutes (removeMiddlewares) {
-      if (removeMiddlewares === true){
+      if (removeMiddlewares === true) {
         this.bucketChain.clear()
         this.setDefaultRoutes()
       } else {
@@ -156,7 +156,7 @@ function ServerFactory(CoreIO) {
      * @chainable
      * @returns {object} Returns this value
      */
-    use(...args) {
+    use (...args) {
       // this.app.use.apply(this.app, args)
       if (typeof args[0] === 'string') {
         const keys = []
@@ -189,7 +189,7 @@ function ServerFactory(CoreIO) {
      * @chainable
      * @returns {object} Returns this value
      */
-    useAfter(...args) {
+    useAfter (...args) {
       if (typeof args[0] === 'string') {
         const keys = []
         const reg = pathToRegexp(args[0], keys, {
@@ -237,8 +237,8 @@ function ServerFactory(CoreIO) {
 
     }
 
-    registerStaticDir(dir) {
-      this.app.use(express.static(dir));
+    registerStaticDir (dir) {
+      this.app.use(express.static(dir))
     }
 
     runErrorBucket (thisContext, err, req, res) {
@@ -255,7 +255,7 @@ function ServerFactory(CoreIO) {
     }
   }
 
-  return Server;
+  return Server
 }
 
 module.exports = ServerFactory

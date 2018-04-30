@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-let http = require('http');
+let http = require('http')
 
 /**
 * CoreIO Socket
@@ -29,194 +29,193 @@ let http = require('http');
 * })
 *
 */
-module.exports = function(CoreIO) {
-  let log = require('logtopus').getLogger('coreio');
-  let sockjs = require('sockjs');
+module.exports = function (CoreIO) {
+  let log = require('logtopus').getLogger('coreio')
+  let sockjs = require('sockjs')
 
-  let Socket = function(conf) {
-    conf = conf || {};
-    this.port = conf.port || CoreIO.socketPort;
-    this.host = conf.host || CoreIO.socketHost;
-    this.path = conf.path || 'xqsocket';
-    this.channel = conf.channel;
+  let Socket = function (conf) {
+    conf = conf || {}
+    this.port = conf.port || CoreIO.getConfig('socket.port')
+    this.host = conf.host || CoreIO.getConfig('socket.host')
+    this.path = conf.path || 'xqsocket'
+    this.channel = conf.channel
 
     if (!this.channel) {
-      throw new Error('No channel was set!');
+      throw new Error('No channel was set!')
     }
-  };
+  }
 
   /**
    * Holds sockJS instances. One per server.
    * @type {Object} __socketServerInstances
    * @private
    */
-  Socket.__socketServerInstances = {};
+  Socket.__socketServerInstances = {}
 
   /**
    * Contains all channels
    * @type {Object} __channels
    * @private
    */
-  Socket.__channels = {};
+  Socket.__channels = {}
 
-
-  Socket.prototype.getSocketServer = function() {
+  Socket.prototype.getSocketServer = function () {
     if (!Socket.__socketServerInstances[this.host + ':' + this.port]) {
       let socketServer = sockjs.createServer({
-        log: function() {
+        log: function () {
           // console.log('[SOCKET]', arguments);
         }
-      });
+      })
 
-      socketServer.connections = [];
-      socketServer.channels = {};
-      var server = CoreIO.getHttpServer(this.host, this.port);
+      socketServer.connections = []
+      socketServer.channels = {}
+      var server = CoreIO.getHttpServer(this.host, this.port)
 
-      socketServer.installHandlers(server, { prefix: '/' + this.path.replace(/^\//, '') });
+      socketServer.installHandlers(server, { prefix: '/' + this.path.replace(/^\//, '') })
 
-      socketServer.on('connection', function(conn) {
-        log.sys('New connection', conn.id, conn.pathname);
-        Socket.__socketServerInstances[this.host + ':' + this.port].connections.push(conn);
+      socketServer.on('connection', function (conn) {
+        log.sys('New connection', conn.id, conn.pathname)
+        Socket.__socketServerInstances[this.host + ':' + this.port].connections.push(conn)
 
         conn.on('data', (msg) => {
-          msg = JSON.parse(msg);
-          log.req('Got socket message ' + conn.pathname + ' @ ' + msg.channel + ' : ' + msg.eventName, msg.args);
+          msg = JSON.parse(msg)
+          log.req('Got socket message ' + conn.pathname + ' @ ' + msg.channel + ' : ' + msg.eventName, msg.args)
 
-          var args = msg.args || [];
-          args.unshift(msg.eventName);
-          args.push(conn);
+          var args = msg.args || []
+          args.unshift(msg.eventName)
+          args.push(conn)
           if (!socketServer.channels.hasOwnProperty(msg.channel)) {
-            log.warn('Channel ' + msg.channel + ' is not registered!');
-            return;
+            log.warn('Channel ' + msg.channel + ' is not registered!')
+            return
           }
 
-          socketServer.channels[msg.channel].emit.apply(socketServer.channels[msg.channel], args);
-        });
+          socketServer.channels[msg.channel].emit.apply(socketServer.channels[msg.channel], args)
+        })
 
-        conn.on('close', function(err) {
-          log.sys('Close socket connection', err);
+        conn.on('close', function (err) {
+          log.sys('Close socket connection', err)
 
           for (var i = 0, len = Socket.__socketServerInstances[this.host + ':' + this.port].connections.length; i < len; i++) {
             if (Socket.__socketServerInstances[this.host + ':' + this.port].connections[i] === conn) {
-              Socket.__socketServerInstances[this.host + ':' + this.port].connections.splice(i, 1);
-              break;
+              Socket.__socketServerInstances[this.host + ':' + this.port].connections.splice(i, 1)
+              break
             }
           }
 
           if (socketServer.monitoring) {
-            socketServer.monitoring.emit('client.disconnect');
+            socketServer.monitoring.emit('client.disconnect')
           }
-        }.bind(this));
+        }.bind(this))
 
         if (socketServer.monitoring) {
-          socketServer.monitoring.emit('client.connect');
+          socketServer.monitoring.emit('client.connect')
         }
-      }.bind(this));
+      }.bind(this))
 
-      Socket.__socketServerInstances[this.host + ':' + this.port] = socketServer;
+      Socket.__socketServerInstances[this.host + ':' + this.port] = socketServer
     }
 
-    return Socket.__socketServerInstances[this.host + ':' + this.port];
+    return Socket.__socketServerInstances[this.host + ':' + this.port]
   }
 
-  Socket.prototype.getChannel = function() {
+  Socket.prototype.getChannel = function () {
     if (!Socket.__socketServerInstances[this.host + ':' + this.port].channels[this.channel]) {
-      Socket.__socketServerInstances[this.host + ':' + this.port].channels[this.channel] = new CoreIO.Event();
+      Socket.__socketServerInstances[this.host + ':' + this.port].channels[this.channel] = new CoreIO.Event()
     }
 
-    return Socket.__socketServerInstances[this.host + ':' + this.port].channels[this.channel];
+    return Socket.__socketServerInstances[this.host + ':' + this.port].channels[this.channel]
   }
 
   // CoreIO.extend(Socket.prototype, new CoreIO.Event());
 
-  Socket.prototype.start = function() {
-    log.sys('Start SocketServer on port ' + this.port + ' using path ' + this.path);
+  Socket.prototype.start = function () {
+    log.sys('Start SocketServer on port ' + this.port + ' using path ' + this.path)
 
     return new Promise((resolve, reject) => {
-      this.__socket = this.getSocketServer();
-      this.__channel = this.getChannel();
-      resolve();
-    });
-  };
+      this.__socket = this.getSocketServer()
+      this.__channel = this.getChannel()
+      resolve()
+    })
+  }
 
   // Socket.prototype.__emit = Socket.prototype.emit;
 
-  Socket.prototype.stop = function() {
-    log.sys('Stop SocketServer');
-    var numClients = Socket.__socketServerInstances[this.host + ':' + this.port].connections.length;
-    Socket.__socketServerInstances[this.host + ':' + this.port].connections.forEach(function(conn) {
-      conn.close();
-    });
+  Socket.prototype.stop = function () {
+    log.sys('Stop SocketServer')
+    var numClients = Socket.__socketServerInstances[this.host + ':' + this.port].connections.length
+    Socket.__socketServerInstances[this.host + ':' + this.port].connections.forEach(function (conn) {
+      conn.close()
+    })
 
-    //Send socket.diconnect event to all channels
-    Socket.__channels.forEach(function(channel) {
-      channel.emit('socket.disconnect');
-    });
+    // Send socket.diconnect event to all channels
+    Socket.__channels.forEach(function (channel) {
+      channel.emit('socket.disconnect')
+    })
 
-    Socket.__socketServerInstances[this.host + ':' + this.port].connections = [];
+    Socket.__socketServerInstances[this.host + ':' + this.port].connections = []
 
-    log.sys('  ' + numClients + ' disconnected');
-  };
+    log.sys('  ' + numClients + ' disconnected')
+  }
 
-  Socket.prototype.emit = function(eventName, data) {
+  Socket.prototype.emit = function (eventName, data) {
     var time = Date.now(),
-      counter = 0;
+      counter = 0
 
-    var self = this;
+    var self = this
 
-    var args = Array.prototype.slice.call(arguments, 1);
+    var args = Array.prototype.slice.call(arguments, 1)
 
-    Socket.__socketServerInstances[this.host + ':' + this.port].connections.forEach(function(conn) {
-      counter++;
+    Socket.__socketServerInstances[this.host + ':' + this.port].connections.forEach(function (conn) {
+      counter++
 
       conn.write(JSON.stringify({
         eventName: eventName,
         channel: self.channel,
         args: args
-      }));
-    });
+      }))
+    })
 
-    log.res('Send socket message ' + eventName + ' to ' + counter + ' clients in channel ' + this.channel + ' in ' + (Date.now() - time) + 'ms', args);
-  };
+    log.res('Send socket message ' + eventName + ' to ' + counter + ' clients in channel ' + this.channel + ' in ' + (Date.now() - time) + 'ms', args)
+  }
 
-  Socket.prototype.emitOne = function(conn, eventName, data) {
-    var time = Date.now();
+  Socket.prototype.emitOne = function (conn, eventName, data) {
+    var time = Date.now()
 
-    var self = this;
+    var self = this
 
-    var args = Array.prototype.slice.call(arguments, 2);
+    var args = Array.prototype.slice.call(arguments, 2)
 
     conn.write(JSON.stringify({
       eventName: eventName,
       channel: self.channel,
       args: args
-    }));
+    }))
 
-    log.res('Send socket message ' + eventName + ' to one client in channel ' + this.channel + ' in ' + (Date.now() - time) + 'ms', args);
-  };
+    log.res('Send socket message ' + eventName + ' to one client in channel ' + this.channel + ' in ' + (Date.now() - time) + 'ms', args)
+  }
 
-  Socket.prototype.emitGroup = function(group, eventName, data) {
+  Socket.prototype.emitGroup = function (group, eventName, data) {
     var time = Date.now(),
-      counter = 0;
+      counter = 0
 
-    var self = this;
+    var self = this
 
-    var args = Array.prototype.slice.call(arguments, 2);
+    var args = Array.prototype.slice.call(arguments, 2)
 
-    Socket.__socketServerInstances[this.host + ':' + this.port].connections.forEach(function(conn) {
+    Socket.__socketServerInstances[this.host + ':' + this.port].connections.forEach(function (conn) {
       if (conn.groups && conn.groups[group] === true) {
-        counter++;
+        counter++
 
         conn.write(JSON.stringify({
           eventName: eventName,
           channel: self.channel,
           args: args
-        }));
+        }))
       }
-    });
+    })
 
-    log.res('Send socket group message ' + eventName + ' to ' + counter + ' clients in channel ' + this.channel + ' in ' + (Date.now() - time) + 'ms', args);
-  };
+    log.res('Send socket group message ' + eventName + ' to ' + counter + ' clients in channel ' + this.channel + ' in ' + (Date.now() - time) + 'ms', args)
+  }
 
   /**
    * Registers a listener for an incoming socket message
@@ -225,10 +224,9 @@ module.exports = function(CoreIO) {
    * @param {String}   eventName Event name
    * @param {Function} callback  Listener callback
    */
-  Socket.prototype.on = function(eventName, callback) {
-    this.__channel.on(eventName, callback);
-  };
-
+  Socket.prototype.on = function (eventName, callback) {
+    this.__channel.on(eventName, callback)
+  }
 
   /**
    * Registers a once-listener for an incoming socket message.
@@ -238,9 +236,9 @@ module.exports = function(CoreIO) {
    * @param  {String}   eventName Event name
    * @param  {Function} callback  Listener callback
    */
-  Socket.prototype.once = function(eventName, callback) {
-    Socket.__channels[this.channel].once(eventName, callback);
-  };
+  Socket.prototype.once = function (eventName, callback) {
+    Socket.__channels[this.channel].once(eventName, callback)
+  }
 
   /**
    * Unregisters a socket listener
@@ -249,38 +247,38 @@ module.exports = function(CoreIO) {
    * @param  {String}   eventName Event name
    * @param  {Function} callback  Listener callback (Optional)
    */
-  Socket.prototype.off = function(eventName, callback) {
-    Socket.__channels[this.channel].off(eventName, callback);
-  };
+  Socket.prototype.off = function (eventName, callback) {
+    Socket.__channels[this.channel].off(eventName, callback)
+  }
 
-  Socket.prototype.setGroup = function(conn, group) {
+  Socket.prototype.setGroup = function (conn, group) {
     for (var i = 0, len = Socket.__socketServerInstances[this.host + ':' + this.port].connections.length; i < len; i++) {
       if (Socket.__socketServerInstances[this.host + ':' + this.port].connections[i] === conn) {
         if (!Socket.__socketServerInstances[this.host + ':' + this.port].connections[i].groups) {
-          Socket.__socketServerInstances[this.host + ':' + this.port].connections[i].groups = {};
+          Socket.__socketServerInstances[this.host + ':' + this.port].connections[i].groups = {}
         }
 
-        Socket.__socketServerInstances[this.host + ':' + this.port].connections[i].groups[group] = true;
-        break;
+        Socket.__socketServerInstances[this.host + ':' + this.port].connections[i].groups[group] = true
+        break
       }
     }
-  };
+  }
 
-  Socket.prototype.unsetGroup = function(conn, group) {
+  Socket.prototype.unsetGroup = function (conn, group) {
     for (var i = 0, len = Socket.__socketServerInstances[this.host + ':' + this.port].connections.length; i < len; i++) {
       if (Socket.__socketServerInstances[this.host + ':' + this.port].connections[i] === conn) {
         if (Socket.__socketServerInstances[this.host + ':' + this.port].connections[i].groups && Socket.__socketServerInstances[this.host + ':' + this.port].connections[i].groups[group]) {
-          delete Socket.__socketServerInstances[this.host + ':' + this.port].connections[i].groups[group];
+          delete Socket.__socketServerInstances[this.host + ':' + this.port].connections[i].groups[group]
         }
 
-        break;
+        break
       }
     }
-  };
+  }
 
-  Socket.prototype.monitor = function() {
+  Socket.prototype.monitor = function () {
     if (!this.__socket.monitoring) {
-      this.__socket.monitoring = new CoreIO.Event();
+      this.__socket.monitoring = new CoreIO.Event()
 
       this.__socket.monitoring.stats = () => {
         return {
@@ -290,8 +288,8 @@ module.exports = function(CoreIO) {
       }
     }
 
-    return this.__socket.monitoring;
+    return this.__socket.monitoring
   }
 
-  return Socket;
-};
+  return Socket
+}
