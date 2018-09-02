@@ -16,21 +16,21 @@
   "license": "MIT",
   "devDependencies": {
     "@noname-media/eslint-config-standard": "1.1.0",
-    "api-inspect": "0.1.1",
+    "api-inspect": "0.1.2",
     "inspect.js": "1.11.7",
-    "lagoon-reporter": "0.3.4",
-    "mocha": "5.1.1",
-    "sinon": "5.0.1",
+    "lagoon-reporter": "0.4.0",
+    "mocha": "5.2.0",
+    "sinon": "6.1.5",
     "testberry": "0.2.1"
   },
   "dependencies": {
-    "body-parser": "1.18.2",
+    "body-parser": "1.18.3",
     "co": "4.6.0",
     "cors": "2.8.4",
     "express": "4.16.3",
     "firetpl": "0.6.2",
     "logtopus": "1.0.2",
-    "path-to-regexp": "2.2.1",
+    "path-to-regexp": "2.4.0",
     "sockjs": "0.3.19",
     "superchain": "2.3.2"
   }

@@ -120,7 +120,7 @@ module.exports = (CoreIO) => {
 
     // initialize service
     if (this.service) {
-      const serviceConf = CoreIO.getConf(this.serviceConfKey || this.service.CONF_KEY)
+      const serviceConf = CoreIO.getConfig(this.serviceConfKey || this.service.CONF_KEY)
       serviceConf.name = this.collection || this.table || this.shortName
 
       const Service = this.service(CoreIO)
